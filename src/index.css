@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+   font-family: "DM Sans", sans-serif;
+   letter-spacing: .25px;
+}
+.active-tab{
+  background: #fafcf8;
+  transition: background-color 0.4s ease-in-out, color 0.3s ease;
+}
+
+.active-tab::before,
+.active-tab::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 20px;  /* adjust size */
+  height: 20px; /* adjust size */
+  background-repeat: no-repeat;
+  background-size: contain;
+  z-index: 10;
+}
+
+.active-tab::before {
+  background-image: url('/public/top_merger.svg'); /* set your before image */
+  right: -1px;
+  top: -20px;
+}
+
+.active-tab::after {
+  background-image: url('/public/bottom_merger.svg'); /* set your after image */
+  right: -1px; /* at the right edge */
+  bottom: -20px;
+}
+
+
+.smoke-word::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, rgba(46, 46, 46, 0.4), transparent);
+  animation: smokeUp 2s infinite ease-in-out;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes smokeUp {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translate(-50%, -20px) scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -40px) scale(2);
+  }
+}
