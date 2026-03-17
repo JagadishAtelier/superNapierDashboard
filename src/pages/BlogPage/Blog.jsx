@@ -49,10 +49,10 @@ const filteredBlogs = useMemo(() => {
   const handleView = (blog) => navigate(`/Blogs/blog-view/${blog._id}`, { state: blog });
 
   return (
-    <div className="p-4">
+    <div className="md:p-4">
       <h2 className="text-xl font-semibold mb-4">Blog List</h2>
 
-      <div className="flex items-center justify-between mb-10">
+      <div className="flex md:flex-row flex-col gap-4 items-center justify-between mb-10">
         <div className="relative w-full sm:w-64">
           <input
             type="text"
@@ -65,7 +65,7 @@ const filteredBlogs = useMemo(() => {
 
         <button
           onClick={() => navigate("/Blogs/update")}
-          className="bg-yellow-400 px-4 py-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px]"
+          className="bg-yellow-400 px-4 py-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] w-full md:w-fit"
         >
           Add Blog
         </button>

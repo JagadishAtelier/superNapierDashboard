@@ -49,11 +49,11 @@ const handleSubmit = async (e) => {
       {/* Left side image */}
       <div
         className="hidden md:flex w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: `url('https://img.freepik.com/premium-photo/wedding-cake-wedding-newlyweds_419896-2253.jpg?uid=R175611833&ga=GA1.1.1276842385.1760516584&semt=ais_hybrid&w=740&q=80')` }}
+        style={{ backgroundImage: `url('https://cdn.prod.website-files.com/68baae3cb9467566e1b0a61c/698deb2f6d550496da24ae25_hero_2_1%202-p-2000.webp')` }}
       ></div>
 
       {/* Right side form */}
-      <div className="flex w-full md:w-1/2 justify-center items-center p-8 bg-[#fff9ef]">
+      <div className="flex w-full md:w-1/2 justify-center items-center p-8 bg-[#fafcf8]">
         <div className="max-w-md w-full">
           <h2 className="text-3xl font-semibold text-center mb-6 text-[#280a03]">Welcome Back</h2>
           <form onSubmit={handleSubmit} className="space-y-5 px-5">

@@ -9,7 +9,7 @@ const BlogCard = ({ blog, onDelete, onEdit, onView }) => {
     <div className="group bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full transition-all duration-300">
 
       {/* Image */}
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative md:aspect-[16/10] h-[35vh] md:h-auto overflow-hidden">
         <img
           src={image}
           alt={blog.title}
@@ -18,33 +18,34 @@ const BlogCard = ({ blog, onDelete, onEdit, onView }) => {
 
         {/* Title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4 
-                        bg-gradient-to-t from-black/70 via-black/40 to-transparent">
+                        bg-gradient-to-t from-black/70 via-black/70 to-transparent">
           <h2 className="text-white text-lg font-semibold leading-snug">
             {blog.title?.length > 60 ? blog.title.substring(0, 60) + "..." : blog.title}
           </h2>
         </div>
 
         {/* Hover buttons */}
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center gap-4 
-                        opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+{/* Hover buttons */}
+<div className="absolute lg:inset-0 top-4 left-4 lg:bg-black/50 lg:backdrop-blur-sm flex items-center justify-center lg:gap-4 gap-2
+                opacity-100 lg:opacity-0 group-hover:md:opacity-100 transition-all duration-300 z-10">
 
           <button
             onClick={() => onView(blog)}
-            className="bg-white p-3 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] shadow hover:bg-blue-100 transition"
+            className="bg-white lg:p-3 p-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] shadow hover:bg-blue-100 transition"
           >
             <Eye size={18} className="text-blue-600" />
           </button>
 
           <button
             onClick={() => onEdit(blog)}
-            className="bg-white p-3 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] shadow hover:bg-green-100 transition"
+            className="bg-white lg:p-3 p-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] shadow hover:bg-green-100 transition"
           >
             <Pencil size={18} className="text-green-700" />
           </button>
 
           <button
             onClick={() => onDelete(blog)}
-            className="bg-white p-3 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] shadow hover:bg-red-100 transition"
+            className="bg-white lg:p-3 p-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] shadow hover:bg-red-100 transition"
           >
             <Trash2 size={18} className="text-red-500" />
           </button>

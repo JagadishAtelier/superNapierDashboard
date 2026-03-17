@@ -36,16 +36,7 @@ export default function BlogView() {
   if (!blog) return <div className="text-center py-20">No blog data found</div>;
 
   return (
-    <div className="py-10 px-4 md:px-6">
-
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-600 mb-6 hover:text-gray-800 transition"
-      >
-        <ArrowLeft size={18} /> Back
-      </button>
-
+    <div className="py-10 px-0 md:px-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
         {/* LEFT SIDE IMAGES */}

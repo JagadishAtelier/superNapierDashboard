@@ -174,13 +174,13 @@ const BlogEditor = () => {
   if (loading) return <div className="text-center py-20">Loading...</div>;
 
   return (
-    <div className="flex flex-col p-6">
+    <div className="flex flex-col md:p-6">
       <h2 className="text-xl font-semibold mb-6">{isEdit ? "Edit Blog" : "Add Blog"}</h2>
 
       <div className="w-full">
         {/* Input Fields */}
         <div className="mb-6 space-y-5">
-          <div className="flex gap-4">
+          <div className="flex md:flex-row flex-col gap-4">
             {/* Date */}
             <div className="flex flex-col gap-1 w-full">
               <label className="text-sm font-medium text-gray-700">
@@ -280,7 +280,11 @@ const BlogEditor = () => {
             </div>
           </div>
         </div>
-
+        <div className="mb-2">
+          <label className="text-sm font-medium text-gray-700 ">
+            Content <span className="text-red-500">*</span>
+          </label>
+        </div>
         {/* Editor Toolbar */}
         <div className="bg-white shadow border rounded-xl w-fit px-3 py-2 flex gap-2 mb-3 flex-wrap">
           <button onClick={() => formatText("bold")} className="p-2 hover:bg-gray-100 rounded">
@@ -304,9 +308,9 @@ const BlogEditor = () => {
           <button onClick={addLink} className="p-2 hover:bg-gray-100 rounded">
             <Link2 size={18} />
           </button>
-          <button onClick={() => fileInputRef.current.click()} className="p-2 hover:bg-gray-100 rounded">
+          {/* <button onClick={() => fileInputRef.current.click()} className="p-2 hover:bg-gray-100 rounded">
             <ImageIcon size={18} />
-          </button>
+          </button> */}
           <input
             type="file"
             accept="image/*"
