@@ -48,13 +48,13 @@ export default function ForgotPassword() {
       {/* Left side image */}
       <div
         className="hidden md:flex w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: `url('/login-side.png')` }}
+        style={{ backgroundImage: `url('https://cdn.prod.website-files.com/68baae3cb9467566e1b0a61c/698deb2f6d550496da24ae25_hero_2_1%202-p-2000.webp')` }}
       ></div>
 
       {/* Right side form */}
       <div className="flex w-full md:w-1/2 justify-center items-center p-8 bg-gray-50">
         <div className="max-w-md w-full px-5">
-          <h2 className="text-3xl font-semibold text-center mb-6 text-[#42427D]">
+          <h2 className="text-3xl font-semibold text-center mb-6 text-[#1b5e20]">
             {step === 1 ? 'Forgot Password' : 'Reset Password'}
           </h2>
 
@@ -66,7 +66,7 @@ export default function ForgotPassword() {
 
           {step === 1 && (
             <>
-              <label className="block mb-1 text-gray-700">Email</label>
+              <label className="block mb-1">Email</label>
               <input
                 type="email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#42427D]"
@@ -76,7 +76,7 @@ export default function ForgotPassword() {
               />
               <button
                 onClick={handleSendOtp}
-                className="mt-4 w-full bg-[#42427D] text-white py-2 rounded hover:bg-[#33336a] transition"
+                className="mt-4 w-full bg-[#1b5e20] text-white py-2 rounded"
                 disabled={loading}
               >
                 {loading ? 'Sending...' : 'Send OTP'}
@@ -84,7 +84,7 @@ export default function ForgotPassword() {
 
               <p className="text-center text-sm text-gray-600 mt-4">
                 Remember your password?{' '}
-                <a href="/login" className="text-[#42427D] hover:underline">Login</a>
+                <a href="/login" className="text-[#1b5e20] hover:underline">Login</a>
               </p>
             </>
           )}
@@ -111,7 +111,7 @@ export default function ForgotPassword() {
 
               <button
                 onClick={handleResetPassword}
-                className="mt-4 w-full bg-[#42427D] text-white py-2 rounded hover:bg-[#33336a] transition"
+                className="mt-4 w-full bg-[#1b5e20] text-white py-2 rounded"
                 disabled={loading}
               >
                 {loading ? 'Resetting...' : 'Reset Password'}
@@ -119,7 +119,7 @@ export default function ForgotPassword() {
 
               <button
                 onClick={() => setStep(1)}
-                className="mt-4 w-full text-sm text-[#42427D] hover:underline"
+                className="mt-4 w-full text-sm text-[#1b5e20] hover:underline"
               >
                 Back to Email
               </button>

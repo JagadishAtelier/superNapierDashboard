@@ -25,6 +25,7 @@ import BlogData from './pages/BlogPage/BlogData';
 import Blog from './pages/BlogPage/Blog';
 import BlogView from './pages/BlogPage/BlogView';
 import BlogEditor from './pages/BlogPage/BlogEditor';
+import CategoryForm from './pages/CategoryForm';
 export default function App() {
  const [deferredPrompt, setDeferredPrompt] = useState(null);
 const [blogs, setBlogs] = useState([]);
@@ -61,6 +62,8 @@ const [blogs, setBlogs] = useState([]);
             <Route path="/payments" element={<PaymentDashboard />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/categories" element={<CategoryPage />} />
+            <Route path="/categories/form" element={<CategoryForm />} />
+            <Route path="/categories/form/:id" element={<CategoryForm />} />
             <Route path="/Blogs" element={<Blog />} />
             <Route path="/Blogs/blog-view/:id" element={<BlogView />} />
 <Route

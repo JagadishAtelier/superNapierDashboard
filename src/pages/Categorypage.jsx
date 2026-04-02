@@ -8,9 +8,11 @@ import {
   deleteCategory,
 } from "../api/categoryApi";
 import { uploadToCloudinary } from "../api/imageUpload";
+import { useNavigate } from "react-router-dom";
 
 export default function CategoryPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const navigate = useNavigate()
   const fileInputRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -119,7 +121,7 @@ export default function CategoryPage() {
       <div className="flex justify-between h-10 my-5">
         <h1 className="text-2xl font-semibold mb-6">Manage Categories</h1>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => navigate("/categories/form")}
           className="flex items-center gap-2 border px-4 py-2 rounded-md text-sm text-white bg-green-700 hover:bg-green-600"
         >
           <BoxIcon size={16} /> Add Category
@@ -133,7 +135,7 @@ export default function CategoryPage() {
               <th className="py-3 px-4">#</th>
               <th className="py-3 px-4">Category Image</th>
               <th className="py-3 px-4">Category Name</th>
-              <th className="py-3 px-4">Description</th>
+              {/* <th className="py-3 px-4">Description</th> */}
               <th className="py-3 px-4">Actions</th>
             </tr>
           </thead>
@@ -145,7 +147,7 @@ export default function CategoryPage() {
                   {cat.image ? (
                     <img
                       src={cat.image}
-                      alt={cat.name}
+                      alt={cat.name?.en}
                       className="w-10 h-10 rounded-full object-cover border"
                     />
                   ) : (
@@ -154,14 +156,18 @@ export default function CategoryPage() {
                     </div>
                   )}
                 </td>
-                <td className="py-3 px-4">{cat.name}</td>
-                <td className="py-3 px-4">{cat.description}</td>
+                <td className="py-3 px-4">{cat.name?.en}</td>
+                {/* <td className="py-3 px-4">{cat.description}</td> */}
                 <td className="py-3 px-4 flex gap-4 text-center">
                   <button
                     onClick={() => {
-                      setEditingCategory(cat);
-                      setPreviewImage(null);
-                      setEditError("");
+                      // setEditingCategory(cat);
+                      // setPreviewImage(null); 
+                      // setEditError("");
+                      navigate(`/categories/form/${cat._id}`, {
+                        state: { category: cat }   // ✅ PASS FULL DATA
+                      });
+
                     }}
                     className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
                   >
@@ -220,9 +226,15 @@ export default function CategoryPage() {
 
             <input
               type="text"
-              value={editingCategory.name}
+              value={editingCategory.name?.en || ""}
               onChange={(e) =>
-                setEditingCategory({ ...editingCategory, name: e.target.value })
+                setEditingCategory({
+                  ...editingCategory,
+                  name: {
+                    ...editingCategory.name,
+                    en: e.target.value,
+                  },
+                })
               }
               className="w-full p-2 mb-4 border rounded"
               placeholder="Category Name (English)"
@@ -274,11 +286,10 @@ export default function CategoryPage() {
               </button>
               <button
                 onClick={handleEdit}
-                className={`px-4 py-2 text-white rounded ${
-                  editLoading
-                    ? "bg-blue-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
+                className={`px-4 py-2 text-white rounded ${editLoading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 disabled={editLoading}
               >
                 {editLoading ? (
@@ -325,7 +336,7 @@ export default function CategoryPage() {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow w-full max-w-sm">
             <h2 className="text-lg font-semibold mb-4">Delete Category</h2>
-            <p>Are you sure you want to delete "{deletingCategory.name}"?</p>
+            <p>Are you sure you want to delete "{deletingCategory.name?.en}"?</p>
             <div className="flex justify-end mt-6 gap-2">
               <button
                 onClick={() => setDeletingCategory(null)}
