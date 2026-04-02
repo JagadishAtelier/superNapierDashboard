@@ -46,7 +46,7 @@ const ProductManagement = ({ isActive: isActiveProp, sku: skuProp, onChange }) =
                     onChange={handleToggle}
                     className="peer relative z-10 size-full cursor-pointer opacity-0"
                   />
-                  <div className={`absolute inset-0 rounded-full transition-all ${isActive ? "bg-[#2a0e05]" : "bg-gray-300"}`} />
+                  <div className={`absolute inset-0 rounded-full transition-all ${isActive ? "bg-green-600" : "bg-gray-300"}`} />
                   <div className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow transition-all duration-200 ${isActive ? "translate-x-5" : ""}`} />
                 </div>
                 <label htmlFor="statusToggle" className="text-xs text-gray-600">

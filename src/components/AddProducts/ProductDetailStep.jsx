@@ -1,19 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Paperclip, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import axios from "axios";
 
-const meatCuts = [
-  "Egg",
-  "Eggless"
-];
-
-const cakeFlavors = [
-  "Chocolate",
-  "Black Forest",
-  "Red Velvet",
-  "Fruit",
-  "Vanilla",
-  "Butterscotch",
-  "Strawberry"
+const LANGUAGES = [
+  { code: "en", label: "English", apiCode: "en-t-i0-und" },
+  { code: "ta", label: "Tamil", apiCode: "ta-t-i0-und" },
+  { code: "hi", label: "Hindi", apiCode: "hi-t-i0-und" },
+  { code: "te", label: "Telugu", apiCode: "te-t-i0-und" },
+  { code: "kn", label: "Kannada", apiCode: "kn-t-i0-und" },
+  { code: "ml", label: "Malayalam", apiCode: "ml-t-i0-und" },
 ];
 
 const ProductDetailStep = ({
@@ -21,70 +16,123 @@ const ProductDetailStep = ({
   setDescription,
   tamilDescription,
   setTamilDescription,
-  cutType = [], // default to empty array
-  setCutType,
-  shelfLife,
-  setShelfLife,
-  storageInstructions,
-  setStorageInstructions,
+  hindiDescription,
+  setHindiDescription,
+  teluguDescription,
+  setTeluguDescription,
+  kannadaDescription,
+  setKannadaDescription,
+  malayalamDescription,
+  setMalayalamDescription,
   videoUrl,
   setVideoUrl,
-  onAddVideoClick,
-  flavor,
-  setFlavor,
 }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef();
-  const [isFlavorDropdownOpen, setIsFlavorDropdownOpen] = useState(false);
-  const flavorDropdownRef = useRef();
+  const [formData, setFormData] = useState({
+    en: description || "",
+    ta: tamilDescription || "",
+    hi: hindiDescription || "",
+    te: teluguDescription || "",
+    kn: kannadaDescription || "",
+    ml: malayalamDescription || "",
+  });
+
+  const [activeLang, setActiveLang] = useState("en");
+  const [isSyncing, setIsSyncing] = useState(false);
+  const abortControllerRef = useRef(null);
+  const cache = useRef({});
+
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    setFormData({
+      en: description || "",
+      ta: tamilDescription || "",
+      hi: hindiDescription || "",
+      te: teluguDescription || "",
+      kn: kannadaDescription || "",
+      ml: malayalamDescription || "",
+    });
+  }, [
+    description,
+    tamilDescription,
+    hindiDescription,
+    teluguDescription,
+    kannadaDescription,
+    malayalamDescription,
+  ]);
 
-      // Close Cake Type dropdown
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
-        setIsDropdownOpen(false);
-      }
+  const fetchTransliteration = async (text, targetLang) => {
+    if (!text.trim()) return "";
+    const cacheKey = `${text}_${targetLang}`;
+    if (cache.current[cacheKey]) return cache.current[cacheKey];
 
-      // Close Cake Flavor dropdown
-      if (
-        flavorDropdownRef.current &&
-        !flavorDropdownRef.current.contains(e.target)
-      ) {
-        setIsFlavorDropdownOpen(false);
-      }
-    };
+    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(
+      text
+    )}&itc=${targetLang}&num=1`;
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleCut = (cut) => {
-    const currentCuts = cutType || [];
-    let updatedCuts;
-    if (currentCuts.includes(cut)) {
-      updatedCuts = currentCuts.filter((c) => c !== cut);
-    } else {
-      updatedCuts = [...currentCuts, cut];
+    try {
+      const response = await axios.get(url, {
+        signal: abortControllerRef.current?.signal,
+      });
+      const result = response.data[1][0][1][0];
+      cache.current[cacheKey] = result;
+      return result;
+    } catch {
+      return text;
     }
-    setCutType(updatedCuts);
-    console.log("Selected Cuts:", updatedCuts);
   };
 
-  const toggleFlavor = (selectedFlavor) => {
-    const currentFlavors = flavor || [];
-    let updatedFlavors;
+  const handleInputChange = async (langCode, value) => {
+    // Update local formData
+    setFormData((prev) => ({ ...prev, [langCode]: value }));
 
-    if (currentFlavors.includes(selectedFlavor)) {
-      updatedFlavors = currentFlavors.filter((f) => f !== selectedFlavor);
-    } else {
-      updatedFlavors = [...currentFlavors, selectedFlavor];
+    // Update parent props
+    if (langCode === "en") setDescription(value);
+    if (langCode === "ta") setTamilDescription(value);
+    if (langCode === "hi") setHindiDescription(value);
+    if (langCode === "te") setTeluguDescription(value);
+    if (langCode === "kn") setKannadaDescription(value);
+    if (langCode === "ml") setMalayalamDescription(value);
+
+    // Only auto-transliterate from English
+    if (langCode !== "en") return;
+
+    // Abort previous requests
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
+
+    if (!value.trim()) {
+      setFormData({ en: "", ta: "", hi: "", te: "", kn: "", ml: "" });
+      setDescription("");
+      setTamilDescription("");
+      setHindiDescription("");
+      setTeluguDescription("");
+      setKannadaDescription("");
+      setMalayalamDescription("");
+      return;
     }
 
-    setFlavor(updatedFlavors);
+    setIsSyncing(true);
+
+    const tasks = LANGUAGES.filter((l) => l.code !== "en").map(async (lang) => {
+      const result = await fetchTransliteration(value, lang.apiCode);
+      return { code: lang.code, value: result };
+    });
+
+    const results = await Promise.all(tasks);
+
+    setFormData((prev) => {
+      const updated = { ...prev };
+      results.forEach((r) => {
+        updated[r.code] = r.value;
+        if (r.code === "ta") setTamilDescription(r.value);
+        if (r.code === "hi") setHindiDescription(r.value);
+        if (r.code === "te") setTeluguDescription(r.value);
+        if (r.code === "kn") setKannadaDescription(r.value);
+        if (r.code === "ml") setMalayalamDescription(r.value);
+      });
+      return updated;
+    });
+
+    setIsSyncing(false);
   };
 
   return (
@@ -95,194 +143,52 @@ const ProductDetailStep = ({
           Product Detail
         </div>
 
+        {isSyncing && (
+          <p className="text-blue-500 text-sm mb-2">Syncing translations...</p>
+        )}
+
         <div className="mt-5 flex flex-col gap-5">
-          {/* Product Description */}
-          <div className="flex flex-col xl:flex-row items-start">
-            <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Product Description</div>
-            </div>
-            <div className="mt-3 xl:mt-0 flex-1 w-full">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={6}
-                placeholder="Describe the cake flavor, ingredients, weight, and customization details..."
-                className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-            </div>
-          </div>
-
-          {/* Tamil Description */}
-          {/* <div className="flex flex-col xl:flex-row items-start">
-            <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Tamil Description</div>
-            </div>
-            <div className="mt-3 xl:mt-0 flex-1 w-full">
-              <textarea
-                value={tamilDescription}
-                onChange={(e) => setTamilDescription(e.target.value)}
-                rows={6}
-                placeholder="உங்கள் தயாரிப்பைப் தமிழில் விவரிக்கவும்..."
-                className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-            </div>
-          </div> */}
-
-
-          {/* Cut Type */}
-          <div className="flex flex-col xl:flex-row items-start relative">
-            <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Cake Type</div>
-            </div>
-            <div className="mt-3 xl:mt-0 flex-1 w-full relative" ref={dropdownRef}>
-              <div
-                className="border rounded-md px-3 py-2 flex flex-wrap gap-1 items-center cursor-pointer min-h-[44px]"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          {/* Language Tabs */}
+          <div className="flex space-x-2 border-b mb-2">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                type="button"
+                className={`px-3 py-1 text-sm border-b-2 font-medium ${
+                  activeLang === lang.code
+                    ? "border-indigo-500 text-indigo-600"
+                    : "border-transparent text-gray-500"
+                }`}
+                onClick={() => setActiveLang(lang.code)}
               >
-                {(!cutType || cutType.length === 0) && (
-                  <span className="text-gray-400">Select cake types...</span>
-                )}
-                {cutType?.map((cut) => (
-                  <div
-                    key={cut}
-                    className="flex items-center bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm"
-                  >
-                    {cut}
-                    <X
-                      className="ml-1 cursor-pointer"
-                      size={14}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCut(cut);
-                      }}
-                    />
-                  </div>
-                ))}
-                <ChevronDown className="ml-auto size-4" />
-              </div>
-
-              {isDropdownOpen && (
-                <div className="absolute top-full left-0 w-full max-h-40 overflow-y-auto border rounded-md bg-white z-20 shadow-lg mt-1">
-                  {meatCuts.map((cut) => (
-                    <div
-                      key={cut}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCut(cut);
-                      }}
-                      className={`px-3 py-2 cursor-pointer hover:bg-indigo-50 ${cutType?.includes(cut) ? "bg-indigo-100 font-semibold" : ""
-                        }`}
-                    >
-                      {cut}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                {lang.label}
+              </button>
+            ))}
           </div>
 
-          {/* Cake Flavor */}
-          {/* Cake Flavor */}
-          <div className="flex flex-col xl:flex-row items-start relative">
-            <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Cake Flavor</div>
-            </div>
-
-            <div
-              className="mt-3 xl:mt-0 flex-1 w-full relative"
-              ref={flavorDropdownRef}
-            >
-              <div
-                className="border rounded-md px-3 py-2 flex flex-wrap gap-1 items-center cursor-pointer min-h-[44px]"
-                onClick={() => setIsFlavorDropdownOpen(!isFlavorDropdownOpen)}
-              >
-                {(!flavor || flavor.length === 0) && (
-                  <span className="text-gray-400">Select cake flavors...</span>
-                )}
-
-                {flavor?.map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm"
-                  >
-                    {item}
-                    <X
-                      className="ml-1 cursor-pointer"
-                      size={14}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFlavor(item);
-                      }}
-                    />
-                  </div>
-                ))}
-
-                <ChevronDown className="ml-auto size-4" />
-              </div>
-
-              {isFlavorDropdownOpen && (
-                <div className="absolute top-full left-0 w-full max-h-40 overflow-y-auto border rounded-md bg-white z-20 shadow-lg mt-1">
-                  {cakeFlavors.map((item) => (
-                    <div
-                      key={item}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFlavor(item);
-                      }}
-                      className={`px-3 py-2 cursor-pointer hover:bg-indigo-50 ${flavor?.includes(item)
-                        ? "bg-indigo-100 font-semibold"
-                        : ""
-                        }`}
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Shelf Life */}
-          <div className="flex flex-col xl:flex-row items-start">
-            <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Shelf Life</div>
-            </div>
-            <div className="mt-3 xl:mt-0 flex-1 w-full">
-              <input
-                type="text"
-                value={shelfLife}
-                onChange={(e) => setShelfLife(e.target.value)}
-                placeholder="e.g., Best before 2 days when refrigerated"
-                className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-            </div>
-          </div>
-
-          {/* Storage Instructions */}
-          <div className="flex flex-col xl:flex-row items-start">
-            <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Storage Instructions</div>
-            </div>
-            <div className="mt-3 xl:mt-0 flex-1 w-full">
-              <textarea
-                value={storageInstructions}
-                onChange={(e) => setStorageInstructions(e.target.value)}
-                rows={3}
-                placeholder="Store in refrigerator. Keep at 0–4°C. Avoid direct sunlight."
-                className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-            </div>
-          </div>
+          {/* Active Language Textarea */}
+          <textarea
+            value={formData[activeLang]}
+            onChange={(e) => handleInputChange(activeLang, e.target.value)}
+            rows={6}
+            placeholder={`Type ${LANGUAGES.find((l) => l.code === activeLang).label} description`}
+            disabled={activeLang !== "en" && !formData.en}
+            className={`w-full rounded-md border px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 ${
+              activeLang !== "en" && !formData.en
+                ? "bg-gray-100 cursor-not-allowed"
+                : "bg-white"
+            }`}
+          />
 
           {/* Product Video */}
-          <div className="flex flex-col xl:flex-row items-start">
+          <div className="flex flex-col xl:flex-row items-start mt-5">
             <div className="w-full xl:w-64 xl:mr-10">
               <div className="font-medium">Product Video</div>
             </div>
             <div className="mt-3 xl:mt-0 flex-1 w-full">
               <input
                 type="url"
-                placeholder="Add YouTube video link of cake preparation or decoration"
+                placeholder="Add YouTube video link of product"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"

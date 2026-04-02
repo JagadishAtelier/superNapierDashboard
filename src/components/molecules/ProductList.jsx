@@ -93,8 +93,8 @@ export default function ProductList() {
   const exportToExcel = () => {
     const data = filteredProducts.map((p) => ({
       ID: p._id,
-      Name: p.name,
-      Category: p.category?.name || "N/A",
+      Name: p.name?.en,
+      Category: p.category?.name?.en || "N/A",
       Stock: p.stock || "N/A",
       Price:
         p.weightOptions.find((w) => w.weight === 1000)?.price ||
@@ -120,8 +120,8 @@ export default function ProductList() {
       head: [["ID", "Name", "Category", "Stock", "Price", "Status"]],
       body: filteredProducts.map((p) => [
         p._id,
-        p.name,
-        p.category?.name || "N/A",
+          p.name?.en,
+  p.category?.name?.en || "N/A",
         p.stock || "N/A",
         p.weightOptions.find((w) => w.weight === 1000)?.price ||
           p.weightOptions[0]?.price ||
@@ -156,7 +156,7 @@ export default function ProductList() {
       (t) => (
         <div className="flex items-center justify-between gap-4">
           <span className="text-sm">
-            Deleted <b>{product.name}</b>
+            Deleted <b>{product.name?.en}</b>
           </span>
           <button
             className="text-blue-600 hover:underline text-sm"
@@ -176,10 +176,10 @@ export default function ProductList() {
       if (!undoCalled) {
         deleteProduct(product._id)
           .then(() => {
-            toast.success(`${product.name} deleted from server.`);
+            toast.success(`${product.name?.en} deleted from server.`);
           })
           .catch(() => {
-            toast.error(`Failed to delete ${product.name} from server.`);
+            toast.error(`Failed to delete ${product.name?.en} from server.`);
             setProducts((prev) => [product, ...prev]);
           });
       }
@@ -274,7 +274,7 @@ export default function ProductList() {
               (cat) =>
                 cat && (
                   <option key={cat._id} value={cat._id}>
-                    {cat.name}
+                    {cat.name?.en}
                   </option>
                 )
             )}
@@ -323,18 +323,18 @@ export default function ProductList() {
                   <td className="p-3">
                     <ProductImageSlider
                       images={product.images}
-                      title={product.name}
+                      title={product.name?.en}
                     />
                   </td>
 
-                  <td className="p-3 whitespace-nowrap">
-                    {product.name.split(" ").slice(0, 5).join(" ")}
-                    {product.name.split(" ").length > 10 && "..."}
-                  </td>
+<td className="p-3 whitespace-nowrap">
+  {product.name?.en?.split(" ").slice(0, 5).join(" ")}
+  {product.name?.en?.split(" ").length > 10 && "..."}
+</td>
 
-                  <td className="p-3 whitespace-nowrap">
-                    {product.category?.name || "N/A"}
-                  </td>
+<td className="p-3 whitespace-nowrap">
+  {product.category?.name?.en || "N/A"}
+</td>
 
                   <td className="p-3 whitespace-nowrap">{product.productId}</td>
 
@@ -355,7 +355,7 @@ export default function ProductList() {
                   </td>
 
                   <td className="p-4">
-                    <div className="flex flex-wrap items-center gap-2 justify-center">
+                    <div className="flex flex-wrap items-center gap-2 ">
                       <button
                         className="flex items-center text-indigo-600 hover:underline text-sm"
                         onClick={() => handleEditClick(product)}
