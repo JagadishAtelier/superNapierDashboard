@@ -26,6 +26,7 @@ import Blog from './pages/BlogPage/Blog';
 import BlogView from './pages/BlogPage/BlogView';
 import BlogEditor from './pages/BlogPage/BlogEditor';
 import CategoryForm from './pages/CategoryForm';
+import NewDashboard from './pages/NewDashboard/NewDashboard';
 export default function App() {
  const [deferredPrompt, setDeferredPrompt] = useState(null);
 const [blogs, setBlogs] = useState([]);
@@ -51,7 +52,7 @@ const [blogs, setBlogs] = useState([]);
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>  
           <Route path="/" element={<DashboardLayout />}>
-            <Route index element={<DashboardPage />} />
+            <Route index element={<NewDashboard />} />
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:orderId" element={<OrderDetailsPage/>} />
             <Route path="/products" element={<ProductList />} />

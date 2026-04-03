@@ -33,7 +33,7 @@ function NewOrdersList() {
   };
 
   return (
-    <div className="md:p-5">
+    <div className="md:p-5 bg-white shadow-sm rounded-3xl">
       <h2 className="text-xl font-semibold mb-4">New Order Updates</h2>
 
       <div className="overflow-x-auto">
@@ -58,7 +58,7 @@ function NewOrdersList() {
               orders.map((order) => (
                 <tr
                   key={order._id}
-                  className="bg-white border rounded-lg shadow-sm hover:shadow-md transition"
+                  className=""
                 >
                   <td className="p-3 font-medium text-indigo-600 underline decoration-dotted">
                     {order.orderId || order.id}
