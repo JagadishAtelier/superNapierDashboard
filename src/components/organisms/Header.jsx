@@ -11,27 +11,29 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
     <header className="bg-[#fafcf8] rounded-tl-[50px] rounded-tr-[50px] py-4 px-4 sm:px-6 md:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
       
       {/* Welcome text for desktop */}
-      <div className="text-2xl hidden sm:block sm:text-3xl text-[#42427D]">
+      <div className="text-2xl hidden lg:block md:text-lg  lg:text-3xl text-[#42427D]">
         <span className="font-medium me-1">Welcome</span>, <strong>Admin</strong>
       </div>
 
       {/* Search, Mobile Menu & Icons */}
-      <div className="flex sm:flex-nowrap items-center gap-3 w-full sm:w-auto">
+      <div className="flex sm:flex-nowrap items-center gap-3 w-full">
         
         {/* Mobile Hamburger Menu Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="sm:hidden bg-[#F3F6FF] text-[#2E2E62] px-4 py-2 rounded-tl-[18px] h-12 rounded-tr-[5px] rounded-br-[18px] rounded-bl-[5px] "
+          className="lg:hidden bg-[#F3F6FF] text-[#2E2E62] px-4 py-2 rounded-tl-[18px] h-12 rounded-tr-[5px] rounded-br-[18px] rounded-bl-[5px] "
         >
           {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-
+      <div className="text-2xl hidden md:block lg:hidden md:text-lg  lg:text-3xl text-[#42427D]">
+        <span className="font-medium me-1">Welcome</span>, <strong>Admin</strong>
+      </div>
         {/* Search Input */}
-        <div className="relative flex-1 sm:w-72">
+        <div className="relative flex-1 md:w-72">
           <input
             type="text"
             placeholder="Search..."
-            className="bg-[#80808033] text-[#0a2613] text-sm sm:text-lg border border-transparent rounded-tl-[18px] h-12 rounded-tr-[5px] rounded-br-[18px] rounded-bl-[5px] px-4 py-2 w-full pr-10
+            className="bg-[#80808033] text-[#0a2613] text-sm md:text-lg border border-transparent rounded-tl-[18px] h-12 rounded-tr-[5px] rounded-br-[18px] rounded-bl-[5px] px-4 py-2 w-full pr-10
             focus:border focus:border-gray-300 focus:outline-none transition-colors duration-300 ease-in-out"
           />
           <svg

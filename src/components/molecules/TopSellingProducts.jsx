@@ -32,11 +32,11 @@ export default function TopSellingProducts({ products = [] }) {
                 <span className="text-sm text-[#2E2E62] font-semibold">{index + 1}</span>
                 <img
                   src={p.image || "/placeholder.png"}
-                  alt={p.name}
+                  alt={p.name?.en}
                   className="w-12 h-12 object-cover rounded shadow"
                 />
                 <div className="min-w-0">
-                  <p className="text-sm text-[#2E2E62] font-medium truncate">{p.name}</p>
+                  <p className="text-sm text-[#2E2E62] font-medium truncate">{p.name?.en}</p>
                   <p className="text-xs text-gray-500">{p.productKey || ""}</p>
                 </div>
               </div>

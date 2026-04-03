@@ -312,7 +312,7 @@ export default function OrderDetailsPage() {
         <div className="md:col-span-2 space-y-6">
           {/* Buyer / Payment / Products (same layout) */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-[#f4ebe2] shadow rounded-xl p-6 border-l-4 border-[#fdc700] hover:shadow-lg transition">
+            <div className="bg-white shadow rounded-xl p-6 border-l-4 border-green-600 hover:shadow-lg transition">
               <h2 className="font-semibold text-lg mb-3 text-gray-700">
                 Buyer Information
               </h2>
@@ -351,7 +351,7 @@ export default function OrderDetailsPage() {
                 {order.deliveryInstructions || "N/A"}
               </p>
             </div>
-            <div className="bg-[#f4ebe2] shadow rounded-xl p-6 border-l-4 border-[#fdc700] hover:shadow-lg transition">
+            <div className="bg-white shadow rounded-xl p-6 border-l-4 border-green-600 hover:shadow-lg transition">
               <h2 className="font-semibold text-lg mb-3 text-gray-700">
                 Payment Information
               </h2>
@@ -391,7 +391,7 @@ export default function OrderDetailsPage() {
                   <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
                     <img
                       src={imageUrl}
-                      alt={p.productId?.name || productInfo?.name}
+                      alt={p.productId?.name?.en || productInfo?.name?.en || "product"}
                       className="w-full h-full object-cover"
                       onError={(e) => (e.target.src = "/placeholder.png")}
                     />
@@ -399,7 +399,7 @@ export default function OrderDetailsPage() {
                   <div className="flex-1 flex flex-col justify-between h-full">
                     <div>
                       <h3 className="font-semibold text-gray-800">
-                        {p.productId?.name || productInfo?.name || "Product"}
+                        {p.productId?.name?.en || productInfo?.name?.en || "Product"}
                       </h3>
                       <div className="flex gap-4 text-gray-500 mt-1">
                         <span>Weight: {p.weight ?? "-"}</span>
@@ -427,7 +427,7 @@ export default function OrderDetailsPage() {
         {/* Right column */}
         <div className="space-y-6">
           <div className="">
-            <div className="bg-[#f4ebe2] shadow-lg rounded-xl p-6 border-t-4 border-[#fdc700]">
+            <div className="bg-white shadow-lg rounded-xl p-6 border-t-4 border-green-600">
               <h2 className="font-semibold text-lg text-gray-700 mb-4">
                 Order Summary
               </h2>

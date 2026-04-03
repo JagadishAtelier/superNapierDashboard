@@ -65,7 +65,7 @@ const filteredBlogs = useMemo(() => {
 
         <button
           onClick={() => navigate("/Blogs/update")}
-          className="bg-yellow-400 px-4 py-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] w-full md:w-fit"
+          className="bg-green-600 text-white px-4 py-2 rounded-tl-[10px] rounded-tr-[5px] rounded-br-[10px] rounded-bl-[5px] w-full md:w-fit"
         >
           Add Blog
         </button>

@@ -21,7 +21,7 @@ export default function Sidebar({ setSidebarOpen }) {
   const location = useLocation();
 
   const handleNavClick = () => {
-    if (window.innerWidth < 640 && setSidebarOpen) {
+    if (window.innerWidth < 991 && setSidebarOpen) {
       setSidebarOpen(false);
     }
   };
@@ -57,7 +57,7 @@ export default function Sidebar({ setSidebarOpen }) {
         <button
           onClick={() => setCollapsed(!collapsed)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="absolute bottom-14 -right-3 transition-all duration-300 ease-in-out hidden sm:block bg-[#fdc700] text-[#0a2613] p-1 rounded-full shadow-md"
+          className="absolute bottom-14 -right-3 transition-all duration-300 ease-in-out hidden lg:block bg-[#fdc700] text-[#0a2613] p-1 rounded-full shadow-md"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>

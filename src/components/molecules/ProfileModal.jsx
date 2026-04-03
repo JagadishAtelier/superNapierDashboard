@@ -89,7 +89,7 @@ export default function ProfileModal({ open, onClose }) {
           </li>
 
           {/* Install App Button (Mobile Only) */}
-          {isMobile && canInstall && (
+          {/* {isMobile && canInstall && (
             <li
               className="flex items-center gap-2 py-2 px-1 cursor-pointer text-green-600 hover:text-green-700"
               onClick={handleInstallPWA}
@@ -97,7 +97,7 @@ export default function ProfileModal({ open, onClose }) {
               <Download className="w-4 h-4" />
               Install App
             </li>
-          )}
+          )} */}
 
           <li
             className="flex items-center gap-2 py-2 px-1 cursor-pointer text-red-500 hover:text-red-700"

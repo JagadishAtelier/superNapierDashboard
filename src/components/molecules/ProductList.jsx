@@ -218,7 +218,7 @@ export default function ProductList() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => navigate("/addproducts")}
-            className="flex items-center gap-2 px-4 py-2 rounded-md text-sm text-[#280a03] bg-[#ffcc0f] hover:bg-[#ffcc0f]"
+            className="flex items-center gap-2 px-4 py-2 rounded-md text-sm text-white bg-green-600"
           >
             <BoxIcon size={16} /> Add Product
           </button>

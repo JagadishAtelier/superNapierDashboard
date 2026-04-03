@@ -63,8 +63,8 @@ export default function DashboardPage() {
   const visitorsByDay = stats.visitors?.byDay || [];
 
   return (
-    <div className="flex flex-col md:flex-row flex-wrap">
-      <div className="w-full md:w-3/5 flex flex-col gap-2 p-4">
+    <div className="flex flex-col lg:flex-row flex-wrap">
+      <div className="w-full lg:w-3/5 flex flex-col gap-2 p-4">
         <div className="flex flex-col sm:flex-row gap-2">
           <StatCard
             label="Orders"
