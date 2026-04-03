@@ -22,7 +22,7 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col rounded-none lg:rounded-[40px] bg-[#fafcf8] lg:my-3 lg:me-3 w-full">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 overflow-auto rounded-none md:rounded-[40px] p-3">
+        <main className="flex-1 overflow-auto rounded-none md:rounded-[40px] md:p-3 p-4">
           <Outlet />
         </main>
       </div>

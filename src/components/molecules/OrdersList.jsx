@@ -177,7 +177,7 @@ export default function TransactionList() {
   };
 
   return (
-    <div className="p-5">
+    <div className="md:p-5">
       <h2 className="text-xl font-semibold mb-4">Orders List</h2>
 
       {/* Filters */}
@@ -218,7 +218,7 @@ export default function TransactionList() {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-separate border-spacing-y-2">
+        <table className="w-full text-sm border-separate border-spacing-y-2 bg-white rounded-md">
           <thead className="text-left text-gray-600">
             <tr>
               <th className="p-3"><input type="checkbox" /></th>

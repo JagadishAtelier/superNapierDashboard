@@ -161,7 +161,7 @@ const PaymentDashboard = () => {
   const diff = monthlyCredited - lastMonthCredited;
 
   return (
-    <div className="px-2 sm:p-6 space-y-8">
+    <div className="md:p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold sm:mb-4">Payments Details</h2>
         <button

@@ -33,7 +33,7 @@ function NewOrdersList() {
   };
 
   return (
-    <div className="p-5">
+    <div className="md:p-5">
       <h2 className="text-xl font-semibold mb-4">New Order Updates</h2>
 
       <div className="overflow-x-auto">

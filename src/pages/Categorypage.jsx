@@ -110,7 +110,7 @@ export default function CategoryPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="md:p-6">
       {/* ✅ Success Toast */}
       {successMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
@@ -118,11 +118,11 @@ export default function CategoryPage() {
         </div>
       )}
 
-      <div className="flex justify-between h-10 my-5">
-        <h1 className="text-2xl font-semibold mb-6">Manage Categories</h1>
+      <div className="flex md:flex-row flex-col justify-between my-5 gap-4">
+        <h1 className="text-2xl font-semibold">Manage Categories</h1>
         <button
           onClick={() => navigate("/categories/form")}
-          className="flex items-center gap-2 border px-4 py-2 rounded-md text-sm text-white bg-green-700 hover:bg-green-600"
+          className="flex items-center gap-2 border px-4 py-2 w-fit ms-auto md:ms-0 rounded-md text-sm text-white bg-green-700 hover:bg-green-600"
         >
           <BoxIcon size={16} /> Add Category
         </button>

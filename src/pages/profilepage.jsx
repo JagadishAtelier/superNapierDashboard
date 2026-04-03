@@ -321,18 +321,18 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className=" p-4 sm:p-6 lg:p-8 flex items-center justify-center font-inter min-h-screen">
+    <div className="md:p-6 lg:p-8 flex items-center justify-center font-inter min-h-screen">
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6 sm:p-8 lg:p-10">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 text-center">My Profile</h1>
 
-        <section className="mb-10 p-6  rounded-lg border border-gray-200">
-          <div className="flex justify-between items-center mb-6 border-b pb-3">
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
+        <section className="mb-10 md:p-6  rounded-lg md:border border-gray-200">
+          <div className="flex md:flex-row flex-col gap-4 justify-between items-center mb-6 border-b pb-3">
+            <h2 className="text-2xl font-semibold text-gray-800 flex md:items-center gap-2">
               <User className="text-blue-600" /> Profile Information
             </h2>
             <button
               onClick={() => setShowEditProfileModal(true)}
-              className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md"
+              className="inline-flex items-center ms-auto md:ms-0 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md"
             >
               <Edit size={16} className="mr-2" /> Edit Profile
             </button>
@@ -352,7 +352,7 @@ const ProfilePage = () => {
               </p>
 
               <div className="mt-4">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex md:flex-row flex-col md:items-center gap-4 justify-between mb-3">
                   <h3 className="font-semibold text-gray-800 flex items-center gap-2"> Pickup Address</h3>
                   {/* only show add button when no address exists */}
                   {canAddAddress && (
@@ -442,7 +442,7 @@ const ProfilePage = () => {
 
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={handleCloseEditProfileModal} className="inline-flex justify-center py-2 px-6 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-[#F3F6FF]">Cancel</button>
-            <button type="submit" className="inline-flex justify-center py-2 px-6 border border-transparent text-sm font-medium rounded-md  bg-[#280a03] text-[#ffcc0f] hover:bg-[#ffcc0f] hover:text-[#280a03] ">Save Changes</button>
+            <button type="submit" className="inline-flex justify-center py-2 px-6 border border-transparent text-sm font-medium rounded-md  bg-green-600 text-white ">Save Changes</button>
           </div>
         </form>
       </Modal>

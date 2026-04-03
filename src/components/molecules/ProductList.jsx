@@ -197,7 +197,7 @@ export default function ProductList() {
     );
 
   return (
-    <div className="p-4 sm:p-5">
+    <div className="md:p-5">
       <h2 className="text-xl font-semibold mb-4">Product List</h2>
 
       {/* Top Actions */}

@@ -64,7 +64,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col lg:flex-row flex-wrap">
-      <div className="w-full lg:w-3/5 flex flex-col gap-2 p-4">
+      <div className="w-full lg:w-3/5 flex flex-col gap-2 md:p-4">
         <div className="flex flex-col sm:flex-row gap-2">
           <StatCard
             label="Orders"
@@ -88,7 +88,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="w-full md:w-2/5 p-4 pt-0 md:pt-4">
+      <div className="w-full md:w-2/5 md:p-4 pt-0 md:pt-4">
         <TopSellingProducts products={topProducts} />
         <UniqueVisitorsChart
           revenueData={revenueByDay}
