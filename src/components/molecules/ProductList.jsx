@@ -75,11 +75,12 @@ export default function ProductList() {
     if (!Array.isArray(products)) return [];
 
     return products.filter((p) => {
-      const matchesSearch =
-        (p.name + p._id + (p.category?.name || ""))
-          .toLowerCase()
-          .includes(search.toLowerCase());
-
+      const searchText = search.toLowerCase();
+      const name = p.name?.en?.toLowerCase() || "";
+      const category = p.category?.name?.en?.toLowerCase() || "";
+      const id = p._id?.toLowerCase() || "";
+      
+      const matchesSearch = name.includes(searchText) || id.includes(searchText) || category.includes(searchText);
       const matchesStatus = statusFilter ? p.status === statusFilter : true;
       const matchesCategory = categoryFilter
         ? p.category?._id === categoryFilter

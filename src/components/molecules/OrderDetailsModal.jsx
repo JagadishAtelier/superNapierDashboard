@@ -121,7 +121,7 @@ export default function OrderDetailsModal({ open, onClose, order }) {
     autoTable(doc, {
       startY: y,
       head: [["Product", "Quantity", "Price"]],
-      body: detailedProducts.map((p) => [p.name, String(p.qty || 0), p.price ? `₹${p.price}` : "N/A"]),
+      body: detailedProducts.map((p) => [p.name?.en || p.name, String(p.qty || 0), p.price ? `₹${p.price}` : "N/A"]),
       theme: "striped",
       headStyles: { fillColor: [33, 37, 41] },
       styles: { font: "helvetica", fontSize: 10 },
@@ -205,11 +205,11 @@ export default function OrderDetailsModal({ open, onClose, order }) {
                 <div key={idx} className="flex items-center gap-4 border p-2 rounded">
                   <img
                     src={product.images?.[0] || product.image || "/placeholder.png"}
-                    alt={product.name}
+                    alt={product.name?.en || "Product"}
                     className="w-16 h-16 object-cover rounded"
                   />
                   <div>
-                    <div className="font-medium">{product.name}</div>
+                    <div className="font-medium">{product.name?.en || product.name}</div>
                     <div className="text-sm text-gray-500">
                       Qty: {product.qty} | ₹{product.price ?? 0}
                     </div>

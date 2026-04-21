@@ -26,7 +26,7 @@ const BlogCard = ({ blog, onDelete, onEdit, onView }) => {
 
         {/* Hover buttons */}
 {/* Hover buttons */}
-<div className="absolute lg:inset-0 top-4 left-4 lg:bg-black/50 lg:backdrop-blur-sm flex items-center justify-center lg:gap-4 gap-2
+<div className="absolute rounded-md lg:inset-0 top-4 left-4 lg:bg-black/50 lg:backdrop-blur-sm flex items-center justify-center lg:gap-4 gap-2
                 opacity-100 lg:opacity-0 group-hover:md:opacity-100 transition-all duration-300 z-10">
 
           <button

@@ -37,6 +37,14 @@ export default function BlogView() {
 
   return (
     <div className="py-10 px-0 md:px-6">
+      <button
+        onClick={() => navigate("/Blogs")}
+        className="flex items-center gap-2 text-gray-600 hover:text-[#0f9c40] transition-colors mb-6 font-semibold"
+      >
+        <ArrowLeft size={20} />
+        <span>Back to Blog List</span>
+      </button>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
         {/* LEFT SIDE IMAGES */}

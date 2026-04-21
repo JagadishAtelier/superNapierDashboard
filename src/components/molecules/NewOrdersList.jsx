@@ -1,93 +1,114 @@
 import { useState, useEffect } from "react";
 import { getOrders } from "../../api/ordersApi";
-import { CheckSquare } from "lucide-react";
+import { CheckSquare, ArrowUpRight, Search } from "lucide-react";
 import OrderDetailsModal from "./OrderDetailsModal";
 import { useNavigate } from "react-router-dom";
+
 function NewOrdersList() {
-    const navigate = useNavigate()
-  const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false);
+    const navigate = useNavigate();
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  const openDetails = (order) => {
-    setSelectedOrder(order);
-    setModalOpen(true);
-  };
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const res = await getOrders();
+                setOrders(res.data.data.slice(0, 5)); // Only show last 5 for dashboard
+            } catch (err) {
+                console.error("Failed to fetch orders", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrders();
+    }, []);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await getOrders();
-        setOrders(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch orders", err);
-      }
+    const formatDate = (dateStr) => {
+        if (!dateStr) return "N/A";
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
-    fetchOrders();
-  }, []);
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "N/A";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-  };
-
-  return (
-    <div className="md:p-5 bg-white shadow-sm rounded-3xl">
-      <h2 className="text-xl font-semibold mb-4">New Order Updates</h2>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border-separate border-spacing-y-2">
-          <thead className="text-left text-gray-600">
-            <tr>
-              <th className="p-3">Order Id</th>
-              <th className="p-3">Buyer Name</th>
-              <th className="p-3">Price</th>
-              <th className="p-3">Created Date</th>
-              <th className="p-3">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center py-8 text-gray-500 italic">
-                  No orders found.
-                </td>
-              </tr>
-            ) : (
-              orders.map((order) => (
-                <tr
-                  key={order._id}
-                  className=""
+    return (
+        <div className="bg-white shadow-sm rounded-[2rem] border border-gray-100 overflow-hidden transition-all hover:shadow-md">
+            <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900 tracking-tight">Recent Orders</h2>
+                    <p className="text-sm text-gray-500 mt-1">Status of your latest customer orders</p>
+                </div>
+                <button 
+                  onClick={() => navigate('/orders')}
+                  className="px-4 py-2 text-sm font-semibold text-emerald-600 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors flex items-center gap-2"
                 >
-                  <td className="p-3 font-medium text-indigo-600 underline decoration-dotted">
-                    {order.orderId || order.id}
-                  </td>
-                  <td className="p-3">{order.buyer?.name || "N/A"}</td>
-                  <td className="p-3">{order.total || 0}</td>
-                  <td className="p-3">{formatDate(order.createdAt)}</td>
-                  <td className="p-3">
-                    <button
-                      className="text-indigo-600 hover:underline flex items-center gap-1"
-                      onClick={() => navigate(`/orders/${order._id}`)}
-                    >
-                      <CheckSquare size={16} /> View Details
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                    View All <ArrowUpRight size={16} />
+                </button>
+            </div>
 
-      <OrderDetailsModal
-        open={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        order={selectedOrder}
-      />
-    </div>
-  );
+            <div className="overflow-x-auto p-4">
+                <table className="w-full text-sm">
+                    <thead>
+                        <tr className="text-left text-gray-400 font-medium">
+                            <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Order ID</th>
+                            <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Buyer</th>
+                            <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Amount</th>
+                            <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[11px]">Date</th>
+                            <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[11px] text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {loading ? (
+                            Array(3).fill(0).map((_, i) => (
+                                <tr key={i} className="animate-pulse">
+                                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-20"></div></td>
+                                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-32"></div></td>
+                                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-16"></div></td>
+                                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-24"></div></td>
+                                    <td className="px-4 py-4"><div className="h-4 bg-gray-100 rounded w-12 ml-auto"></div></td>
+                                </tr>
+                            ))
+                        ) : orders.length === 0 ? (
+                            <tr>
+                                <td colSpan="5" className="text-center py-12 text-gray-500 italic">
+                                    <div className="flex flex-col items-center gap-2 opacity-60">
+                                        <Search size={32} className="text-gray-300" />
+                                        <span>No recent orders found.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : (
+                            orders.map((order) => (
+                                <tr
+                                    key={order._id}
+                                    className="hover:bg-gray-50/80 transition-colors group"
+                                >
+                                    <td className="px-4 py-4 font-bold text-gray-700">
+                                        #{order.orderId || order._id.slice(-8).toUpperCase()}
+                                    </td>
+                                    <td className="px-4 py-4">
+                                        <div className="flex flex-col">
+                                            <span className="font-semibold text-gray-900">{order.buyer?.name || "Anonymous"}</span>
+                                            <span className="text-xs text-gray-400 capitalize">{order.status || 'pending'}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-4 font-bold text-emerald-600">₹{(order.total || order.finalAmount || 0).toLocaleString()}</td>
+                                    <td className="px-4 py-4 text-gray-500 font-medium">{formatDate(order.createdAt)}</td>
+                                    <td className="px-4 py-4 text-right">
+                                        <button
+                                            className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                                            onClick={() => navigate(`/orders/${order._id}`)}
+                                            title="View Details"
+                                        >
+                                            <ArrowUpRight size={20} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
 }
 
 export default NewOrdersList;

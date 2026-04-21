@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Lightbulb,
   Image,
+  ArrowLeft,
 } from "lucide-react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { createBlog, updateBlog, getBlogById } from "../../api/blogApi";
@@ -175,7 +176,16 @@ const BlogEditor = () => {
 
   return (
     <div className="flex flex-col md:p-6">
-      <h2 className="text-xl font-semibold mb-6">{isEdit ? "Edit Blog" : "Add Blog"}</h2>
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={() => navigate("/Blogs")}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          title="Back to Blogs"
+        >
+          <ArrowLeft size={24} className="text-gray-600" />
+        </button>
+        <h2 className="text-xl font-semibold">{isEdit ? "Edit Blog" : "Add Blog"}</h2>
+      </div>
 
       <div className="w-full">
         {/* Input Fields */}
