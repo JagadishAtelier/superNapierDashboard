@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Lightbulb, Image, X, ChevronDown } from "lucide-react";
+import { Lightbulb, Image, X, ChevronDown, ArrowLeft } from "lucide-react";
 import { createCategory,updateCategory } from "../api/categoryApi"; // ✅ ADD THIS
 import { uploadToCloudinary } from "../api/imageUpload"; // ✅ adjust path
 import { useLocation, useNavigate } from "react-router-dom";
@@ -221,8 +221,17 @@ const handleSubmit = async () => {
     return (
         <div className="p-5 bg-white space-y-5 max-w-6xl mx-auto shadow-lg rounded-lg">
 
+            <div className="flex items-center gap-4 mb-4">
+                <button 
+                  onClick={() => navigate(-1)} 
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+                >
+                    <ArrowLeft className="h-6 w-6 text-gray-600 group-hover:text-black" />
+                </button>
+                <h2 className="text-2xl font-bold"> {isEditMode ? "Update Category" : "Add Category"}</h2>
+            </div>
+
             <div>
-                <h2 className="text-2xl font-bold mb-4"> {isEditMode ? "Update Category" : "Add Category"}</h2>
 
                 {isSyncing && (
                     <p className="text-blue-500 text-sm mb-2">Syncing...</p>

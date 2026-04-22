@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  Settings,
 } from "lucide-react";
 
 export default function Sidebar({ setSidebarOpen }) {
@@ -165,7 +166,7 @@ export default function Sidebar({ setSidebarOpen }) {
         </NavLink>
 
         {/* Payments */}
-        <NavLink
+        {/* <NavLink
           to="/payments"
           onClick={handleNavClick}
           className={({ isActive }) =>
@@ -179,7 +180,7 @@ export default function Sidebar({ setSidebarOpen }) {
         >
           <IndianRupee />
           {!collapsed && <span>Payments</span>}
-        </NavLink>
+        </NavLink> */}
         {/* Blog */}
         <NavLink
           to="/Blogs"
@@ -197,22 +198,22 @@ export default function Sidebar({ setSidebarOpen }) {
           {!collapsed && <span>Blogs</span>}
         </NavLink>
 
-        {/* Marketing */}
-        {/* <NavLink
-          to="/marketing"
+        {/* Settings */}
+        <NavLink
+          to="/settings"
           onClick={handleNavClick}
           className={({ isActive }) =>
-            `flex items-center gap-2 ${
-              collapsed ? 'justify-center' : 'ps-3 pe-5'
-            } py-3 rounded-[13px] rounded-tr-[0px] rounded-br-[0px] transition relative ${
-              isActive ? 'text-[#5840BB] font-medium active-tab active-tab-bg' : 'hover:bg-purple-700'
+            `flex items-center gap-2 ${collapsed ? "justify-center" : "ps-3 pe-5"
+            } py-3 rounded-[13px] rounded-tr-[0px] rounded-br-[0px] transition relative ${isActive
+              ? "text-[#0a2613] font-medium active-tab active-tab-bg"
+              : "hover:bg-[#fafcf8] hover:text-[#0a2613]"
             }`
           }
-          title={collapsed ? 'Marketing' : undefined}
+          title={collapsed ? "Settings" : undefined}
         >
-          <Star />
-          {!collapsed && <span>Marketing</span>}
-        </NavLink> */}
+          <Settings />
+          {!collapsed && <span>Settings</span>}
+        </NavLink>
       </nav>
     </aside>
   );

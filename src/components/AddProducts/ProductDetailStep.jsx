@@ -120,16 +120,19 @@ const ProductDetailStep = ({
     const results = await Promise.all(tasks);
 
     setFormData((prev) => {
-      const updated = { ...prev };
-      results.forEach((r) => {
-        updated[r.code] = r.value;
+        const updated = { ...prev };
+        results.forEach((r) => {
+            updated[r.code] = r.value;
+        });
+        return updated;
+    });
+
+    results.forEach((r) => {
         if (r.code === "ta") setTamilDescription(r.value);
         if (r.code === "hi") setHindiDescription(r.value);
         if (r.code === "te") setTeluguDescription(r.value);
         if (r.code === "kn") setKannadaDescription(r.value);
         if (r.code === "ml") setMalayalamDescription(r.value);
-      });
-      return updated;
     });
 
     setIsSyncing(false);

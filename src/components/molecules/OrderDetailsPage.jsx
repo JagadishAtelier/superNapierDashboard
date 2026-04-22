@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getOrderById, updateOrderStatus } from "../../api/ordersApi";
+import { getOrderById, updateOrderStatus, updateOrder } from "../../api/ordersApi";
 import { getProductById } from "../../api/productApi";
-import { ArrowLeft, Check, Pencil, X } from "lucide-react"; // removed MapPin import
+import { ArrowLeft, Check, Pencil, X, ShieldCheck, Loader2 } from "lucide-react"; 
+import { motion, AnimatePresence } from "framer-motion";
 
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -92,6 +93,8 @@ export default function OrderDetailsPage() {
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [isClient, setIsClient] = useState(false); // render maps only client-side
   const mapSectionRef = useRef(null);
+  const [showImageModal, setShowImageModal] = useState(false);
+
 
   useEffect(() => {
     mountedRef.current = true;
@@ -192,8 +195,108 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const handleVerifyPayment = async () => {
+    if (!window.confirm("Are you sure you want to mark this payment as VERIFIED?")) return;
+    
+    try {
+      setOrder(prev => ({ ...prev, _verifying: true }));
+      const res = await updateOrder(order._id, { 
+        paymentStatus: 'paid',
+        paymentDate: new Date()
+      });
+      
+      if (res.data.success) {
+        setOrder(prev => ({ 
+          ...prev, 
+          paymentStatus: 'paid', 
+          paymentDate: new Date().toISOString() 
+        }));
+        toast.success("Payment verified successfully!");
+      }
+    } catch (err) {
+      console.error("Verification failed:", err);
+      toast.error("Failed to verify payment");
+    } finally {
+      setOrder(prev => ({ ...prev, _verifying: false }));
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-10">
+      {/* Screenshot Modal */}
+      <AnimatePresence>
+        {showImageModal && order.paymentProof?.screenshot && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+               <motion.div 
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   onClick={() => setShowImageModal(false)}
+                   className="absolute inset-0 bg-black/90 backdrop-blur-md"
+               />
+               <motion.div 
+                   initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                   animate={{ opacity: 1, scale: 1, y: 0 }}
+                   exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                   className="relative z-10 bg-white rounded-3xl overflow-hidden shadow-2xl max-w-2xl w-full"
+               >
+                   <div className="flex items-center justify-between p-4 border-b">
+                       <h3 className="font-black text-gray-800">Payment Verification</h3>
+                       <button onClick={() => setShowImageModal(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                           <X className="w-5 h-5" />
+                       </button>
+                   </div>
+                   <div className="p-1 bg-gray-100 flex justify-center">
+                       <img 
+                           src={order.paymentProof.screenshot} 
+                           alt="Full Payment Proof" 
+                           className="max-h-[70vh] object-contain shadow-inner"
+                       />
+                   </div>
+                   <div className="p-6 bg-white border-t">
+                       <div className="flex items-center justify-between gap-4">
+                           <div className="flex-1">
+                               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Transaction ID / UTR</p>
+                               <div className="flex items-center gap-2">
+                                    <p className="text-xl font-black text-green-700 font-mono tracking-tight">
+                                        {order.paymentProof.transactionId || "N/A"}
+                                    </p>
+                                    <button 
+                                        onClick={() => {
+                                            safeCopy(order.paymentProof.transactionId);
+                                            toast.success("ID Copied!");
+                                        }}
+                                        className="p-1.5 bg-gray-100 text-gray-500 rounded-lg hover:text-indigo-600 transition-colors"
+                                        title="Copy Transaction ID"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                    </button>
+                               </div>
+                           </div>
+                           
+                           {(order.paymentStatus === 'awaiting_verification' || order.paymentStatus === 'pending') && (
+                               <button 
+                                   onClick={async () => {
+                                       await handleVerifyPayment();
+                                       setShowImageModal(false); // Auto-close modal on success
+                                   }}
+                                   disabled={order._verifying}
+                                   className="px-6 py-3 bg-green-600 text-white rounded-2xl font-black text-sm hover:bg-green-700 transition-all shadow-xl shadow-green-900/20 flex items-center gap-2 whitespace-nowrap"
+                               >
+                                   {order._verifying ? (
+                                       <><Loader2 className="w-4 h-4 animate-spin" /> Verifying...</>
+                                   ) : (
+                                       <><ShieldCheck className="w-5 h-5" /> Mark as Paid</>
+                                   )}
+                               </button>
+                           )}
+                       </div>
+                   </div>
+               </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
@@ -317,64 +420,91 @@ export default function OrderDetailsPage() {
                 Buyer Information
               </h2>
               <p>
-                <span className="font-medium">Name:</span>{" "}
-                {order.buyer?.name || "N/A"}
+                <span className="font-medium text-gray-400">Name:</span>{" "}
+                <span className="font-bold text-gray-800">{order.buyer?.name || order.buyerDetails?.name || "N/A"}</span>
               </p>
               <p>
-                <span className="font-medium">Email:</span>{" "}
-                {order.buyer?.email || "N/A"}
+                <span className="font-medium text-gray-400">Email:</span>{" "}
+                <span className="font-medium text-indigo-600 underline text-sm">{order.buyer?.email || order.buyerDetails?.email || "N/A"}</span>
               </p>
               <p>
-                <span className="font-medium">Phone:</span>{" "}
-                {order.buyerDetails?.phone || "N/A"}
+                <span className="font-medium text-gray-400">Phone:</span>{" "}
+                <span className="font-bold text-gray-800">{order.buyerDetails?.phone || "N/A"}</span>
               </p>
               <p>
-                <span className="font-medium">Address:</span>{" "}
-                {order.shippingAddress?.addressLine1 || "N/A"}
-                {order.shippingAddress?.city
-                  ? `, ${order.shippingAddress.city}`
-                  : ""}
-                  {order.shippingAddress?.state
-                  ? `, ${order.shippingAddress.state}`
-                  : ""
-                   }
-                  {order.shippingAddress?.pincode
-                  ? ` - ${order.shippingAddress.pincode}`
-                  : ""}
+                <span className="font-medium text-gray-400">Address:</span>{" "}
+                <span className="text-gray-700">
+                    {order.shippingAddress?.addressLine1 || "N/A"}
+                    {order.shippingAddress?.city ? `, ${order.shippingAddress.city}` : ""}
+                    {order.shippingAddress?.state ? `, ${order.shippingAddress.state}` : ""}
+                    {order.shippingAddress?.pincode ? ` - ${order.shippingAddress.pincode}` : ""}
+                </span>
               </p>
               <p>
-                <span className="font-medium">Location:</span>{" "}
-                {order.location || "N/A"}
-              </p>
-              <p>
-                <span className="font-medium">Instructions:</span>{" "}
-                {order.deliveryInstructions || "N/A"}
+                <span className="font-medium text-gray-400">Location:</span>{" "}
+                <span className="text-gray-700">{order.location || "N/A"}</span>
               </p>
             </div>
             <div className="bg-white shadow rounded-xl p-6 border-l-4 border-green-600 hover:shadow-lg transition">
               <h2 className="font-semibold text-lg mb-3 text-gray-700">
                 Payment Information
               </h2>
-              <p>
-                <span className="font-medium">Method:</span>{" "}
-                {order.paymentMethod}
-              </p>
-              <p>
-                <span className="font-medium">Status:</span>{" "}
-                {order.paymentStatus}
-              </p>
-              <p>
-                <span className="font-medium">Paid On:</span>{" "}
-                {order.paymentDate
-                  ? new Date(order.paymentDate).toLocaleString()
-                  : "N/A"}
-              </p>
+              <div className="space-y-1">
+                <p>
+                    <span className="font-medium text-gray-400">Method:</span>{" "}
+                    <span className="font-bold text-indigo-600">{order.paymentMethod}</span>
+                </p>
+                <p className="flex items-center gap-2">
+                    <span className="font-medium text-gray-400">Status:</span>{" "}
+                    <span className={`font-bold capitalize ${order.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-500'}`}>
+                        {order.paymentStatus?.replace('_', ' ')}
+                    </span>
+                </p>
+                <p>
+                    <span className="font-medium text-gray-400">Ordered On:</span>{" "}
+                    <span className="font-medium text-gray-800">{new Date(order.createdAt).toLocaleString()}</span>
+                </p>
+                <p>
+                    <span className="font-medium text-gray-400">Paid On:</span>{" "}
+                    <span className="font-medium text-gray-800">
+                        {order.paymentDate ? new Date(order.paymentDate).toLocaleString() : (order.paymentStatus === 'paid' ? new Date(order.updatedAt).toLocaleString() : "N/A")}
+                    </span>
+                </p>
+              </div>
+
+              {order.paymentMethod === "UPI" && order.paymentProof && (
+                <div 
+                    onClick={() => order.paymentProof?.screenshot && setShowImageModal(true)}
+                    className="mt-4 p-4 bg-green-50 rounded-2xl border-2 border-dashed border-green-200 cursor-pointer hover:bg-green-100 transition-all group"
+                >
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-2 flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3" /> Payment Proof (Click to view)
+                        </h3>
+                        <p className="text-xs truncate">
+                            <span className="font-medium text-gray-400">UTR:</span>{" "}
+                            <code className="bg-white px-1.5 py-0.5 rounded text-green-800 font-bold border border-green-100">{order.paymentProof.transactionId || "N/A"}</code>
+                        </p>
+                    </div>
+                    {order.paymentProof.screenshot && (
+                        <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border-2 border-white flex-shrink-0 group-hover:scale-110 transition-transform">
+                            <img 
+                                src={order.paymentProof.screenshot} 
+                                alt="Receipt Thumbnail" 
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-2 text-gray-800 border-b pb-2">
-              Products
+              Products Summary
             </h2>
             {order.products.map((p) => {
               const pid = p.productId?._id || p.productId;
@@ -408,9 +538,6 @@ export default function OrderDetailsPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-gray-700">
-                        Cutting Type: {p.cuttingType || "N/A"}
-                      </p>
-                      <p className="font-medium text-gray-700">
                         Price: ₹{p.price}
                       </p>
                       <p className="font-bold text-indigo-600 text-lg">
@@ -433,14 +560,24 @@ export default function OrderDetailsPage() {
               </h2>
               <div className="space-y-2">
                 <div className="flex justify-between">
+                  <span className="text-gray-500">Shipping Method</span>
+                  <span className={`font-black text-sm px-2 py-0.5 rounded-lg ${order.shippingMethod?.toLowerCase().includes('express') ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {order.shippingMethod || 'Standard Delivery'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span>Total</span>
                   <span>₹{order.total}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Discount</span>
-                  <span>₹{order.discount}</span>
+                  <span>Shipping Fee</span>
+                  <span className="text-gray-700">+ ₹{order.shippingFee || 0}</span>
                 </div>
-                <div className="flex justify-between font-bold text-indigo-600 text-lg mt-2">
+                <div className="flex justify-between">
+                  <span>Discount</span>
+                  <span className="text-red-500">- ₹{order.discount || 0}</span>
+                </div>
+                <div className="flex justify-between font-bold text-indigo-600 text-lg mt-2 border-t pt-2">
                   <span>Final Amount</span>
                   <span>₹{order.finalAmount}</span>
                 </div>
@@ -551,7 +688,7 @@ export default function OrderDetailsPage() {
             id="order-map"
             className="bg-white shadow rounded-xl p-4 border border-gray-100"
           >
-            <h3 className="font-semibold mb-2">Last Known Location</h3>
+            <h3 className="font-semibold mb-2">Delivery Location</h3>
             {isClient && pingLatLng ? (
               <>
                 <div className="w-full h-64 rounded overflow-hidden border">
@@ -612,9 +749,36 @@ export default function OrderDetailsPage() {
                 </div>
               </>
             ) : (
-              <div className="text-gray-500 italic">
-                No location ping available for this order.
-              </div>
+                <div className="space-y-4">
+                    <div className="w-full h-80 rounded-xl overflow-hidden border-2 border-gray-100 shadow-inner bg-gray-50">
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            frameBorder="0" 
+                            scrolling="no" 
+                            marginHeight="0" 
+                            marginWidth="0" 
+                            src={`https://maps.google.com/maps?q=${encodeURIComponent(`${order.shippingAddress?.addressLine1 || ""}, ${order.shippingAddress?.city || ""}, ${order.shippingAddress?.state || ""} ${order.shippingAddress?.pincode || ""}`)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                        ></iframe>
+                    </div>
+                    
+                    <div className="flex items-center justify-between gap-3 bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+                        <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest mb-0.5">Shipping Address Base</p>
+                            <p className="text-sm font-bold text-gray-800 truncate">
+                                {order.shippingAddress?.addressLine1}, {order.shippingAddress?.city}
+                            </p>
+                        </div>
+                        <a 
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.shippingAddress?.addressLine1 || ""}, ${order.shippingAddress?.city || ""}, ${order.shippingAddress?.state || ""} ${order.shippingAddress?.pincode || ""}`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-4 py-2 bg-white text-indigo-600 rounded-lg text-xs font-black shadow-sm border border-indigo-100 hover:bg-indigo-600 hover:text-white transition-all whitespace-nowrap"
+                        >
+                            View Full Map
+                        </a>
+                    </div>
+                </div>
             )}
           </div>
         </div>

@@ -1,18 +1,15 @@
-import axios from "axios";
+import api from "./authApi";
 
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/orders`; // Update based on your backend setup
+const BASE_PATH = "/orders";
 
-export const getOrders = () => axios.get(BASE_URL);
-export const getOrderById = (id) => axios.get(`${BASE_URL}/${id}`);
-export const createOrder = (data) => axios.post(BASE_URL, data);
-export const updateOrder = (id, data) => axios.put(`${BASE_URL}/${id}`, data);
-export const deleteOrder = (id) => axios.delete(`${BASE_URL}/${id}`);
+export const getOrders = () => api.get(BASE_PATH);
+export const getOrderById = (id) => api.get(`${BASE_PATH}/${id}`);
+export const createOrder = (data) => api.post(BASE_PATH, data);
+export const updateOrder = (id, data) => api.put(`${BASE_PATH}/${id}`, data);
+export const deleteOrder = (id) => api.delete(`${BASE_PATH}/${id}`);
 export const updateOrderStatus = (orderId, status) => {
-  return axios.put(`${BASE_URL}/${orderId}/adminorderstatus`, { status });
+  return api.put(`${BASE_PATH}/${orderId}/adminorderstatus`, { status });
 };
 
-// 👇👇 added
-
-export const getUnreadOrders = () => axios.get(`${BASE_URL}/unread`);
-
-export const markOrderAsRead = (id) => axios.patch(`${BASE_URL}/${id}/read`);
+export const getUnreadOrders = () => api.get(`${BASE_PATH}/unread`);
+export const markOrderAsRead = (id) => api.patch(`${BASE_PATH}/${id}/read`);

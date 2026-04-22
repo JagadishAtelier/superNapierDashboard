@@ -1,13 +1,12 @@
-import axios from "axios";
+import api from "./authApi";
 
-// ✅ Ensure this is set in your `.env` file like: VITE_API_BASE_URL=https://yourdomain.com
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/products`;
+const BASE_PATH = "/products";
 
 /**
  * GET all products
  */
 export const getAllProducts = async () => {
-  const response = await axios.get(BASE_URL);
+  const response = await api.get(BASE_PATH);
   return response.data;
 };
 
@@ -16,7 +15,7 @@ export const getAllProducts = async () => {
  * @param {string} productId
  */
 export const getProductById = async (productId) => {
-  const response = await axios.get(`${BASE_URL}/${productId}`);
+  const response = await api.get(`${BASE_PATH}/${productId}`);
   return response.data;
 };
 
@@ -25,7 +24,7 @@ export const getProductById = async (productId) => {
  * @param {object} productData
  */
 export const createProduct = async (productData) => {
-  const response = await axios.post(BASE_URL, productData);
+  const response = await api.post(BASE_PATH, productData);
   return response.data;
 };
 
@@ -35,7 +34,7 @@ export const createProduct = async (productData) => {
  * @param {object} updatedData
  */
 export const updateProduct = async (productId, updatedData) => {
-  const response = await axios.put(`${BASE_URL}/${productId}`, updatedData);
+  const response = await api.put(`${BASE_PATH}/${productId}`, updatedData);
   return response.data;
 };
 
@@ -44,6 +43,6 @@ export const updateProduct = async (productId, updatedData) => {
  * @param {string} productId
  */
 export const deleteProduct = async (productId) => {
-  const response = await axios.delete(`${BASE_URL}/${productId}`);
+  const response = await api.delete(`${BASE_PATH}/${productId}`);
   return response.data;
 };

@@ -136,7 +136,7 @@ export default function CategoryPage() {
               <th className="py-3 px-4">Category Image</th>
               <th className="py-3 px-4">Category Name</th>
               {/* <th className="py-3 px-4">Description</th> */}
-              <th className="py-3 px-4">Actions</th>
+              <th className="py-3 px-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -144,12 +144,17 @@ export default function CategoryPage() {
               <tr key={cat._id} className="border-t hover:bg-gray-50">
                 <td className="py-3 px-4">{i + 1}</td>
                 <td className="py-3 px-4">
-                  {cat.image ? (
-                    <img
-                      src={cat.image}
-                      alt={cat.name?.en}
-                      className="w-10 h-10 rounded-full object-cover border"
-                    />
+                  {cat.image && (Array.isArray(cat.image) ? cat.image.length > 0 : true) ? (
+                    (() => {
+                      const imgUrl = Array.isArray(cat.image) ? cat.image[0] : cat.image;
+                      return (
+                        <img
+                          src={imgUrl}
+                          alt={cat.name?.en}
+                          className={`w-10 h-10 rounded-full ${(imgUrl || "").toLowerCase().endsWith('.png') ? 'object-contain bg-[#eef8ed]' : 'object-cover'} border`}
+                        />
+                      );
+                    })()
                   ) : (
                     <div className="w-10 h-10 rounded-full border bg-gray-200 flex items-center justify-center text-xs text-gray-500">
                       No Image
@@ -157,8 +162,8 @@ export default function CategoryPage() {
                   )}
                 </td>
                 <td className="py-3 px-4">{cat.name?.en}</td>
-                {/* <td className="py-3 px-4">{cat.description}</td> */}
-                <td className="py-3 px-4 flex gap-4 text-center">
+                {/* <td className="py-3 px-4">{cat.description || "No Description"}</td> */}
+                <td className="py-3 px-4 flex justify-center gap-4 text-center">
                   <button
                     onClick={() => {
                       // setEditingCategory(cat);

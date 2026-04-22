@@ -10,6 +10,7 @@ import ProductVariantStep from "./ProductVariantStep";
 import ProductVariant from "./ProductVariantDetails";
 import ProductManagement from "./ProductManagementStep";
 import WeightShippings from "./WeightShippings";
+import MarketingStep from "./MarketingStep";
 
 const EditProduct = () => {
   const { productId } = useParams();
@@ -45,31 +46,22 @@ const [saving, setSaving] = useState(false);
   const [weightOptions, setWeightOptions] = useState([]);
   const [productManagementData, setProductManagementData] = useState({ isActive: false, stock: "", sku: "", price: "" });
   const [weightShippingData, setWeightShippingData] = useState({
-    weight: "",
-    unit: "", // <-- normalized to `unit`
-    dimensions: { width: "", height: "", length: "" },
-    dimensionsUnit: "inch",
-    insurance: "optional",
-    shippingService: "standard",
-    preOrder: false
+    shippingNormalTN: 0,
+    shippingExpressTN: 0,
+    shippingNormalOutside: 0,
+    shippingExpressOutside: 0,
+    isExpressOnly: false
+  });
+  const [marketingData, setMarketingData] = useState({
+    highlights: [],
+    howToUse: []
   });
   const [units, setUnits] = useState([]); // units from backend e.g. ["g","kg","piece"] or [{value,label},...]
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUnits = async () => {
-      try {
-        const res = await fetch("/api/units"); // implement this endpoint to return { units: [...] }
-        if (!res.ok) throw new Error("units fetch failed");
-        const json = await res.json();
-        setUnits(json.units || json || []);
-      } catch (err) {
-        console.warn("Failed to load units from backend, using fallback", err);
-        setUnits(["g", "kg", "piece"]);
-      }
-    };
-
-    fetchUnits();
+    // Standard units fallback
+    setUnits(["g", "kg", "piece", "pack"]);
   }, []);
 
   useEffect(() => {
@@ -82,7 +74,11 @@ const [saving, setSaving] = useState(false);
         setProductInfo({
           productId: data.productId || "",
           productName: data.name?.en || "",
-          tamilName: data.tamilName || "",
+          tamilName: data.name?.ta || "",
+          hindiName: data.name?.hi || "",
+          teluguName: data.name?.te || "",
+          kannadaName: data.name?.kn || "",
+          malayalamName: data.name?.ml || "",
           category: data.category || "",
         });
 
@@ -129,17 +125,17 @@ const [saving, setSaving] = useState(false);
         });
 
         setWeightShippingData({
-          weight: data.shipping?.weight || "",
-          unit: data.shipping?.weightUnit || "", // map shipping unit from backend if present
-          dimensions: {
-            width: data.shipping?.size?.width || "",
-            height: data.shipping?.size?.height || "",
-            length: data.shipping?.size?.length || "",
-          },
-          dimensionsUnit: data.shipping?.size?.unit || "inch",
-          insurance: "optional",
-          shippingService: "standard",
-          preOrder: false,
+          shippingNormalTN: data.shippingNormalTN || 0,
+          shippingExpressTN: data.shippingExpressTN || 0,
+          shippingNormalOutside: data.shippingNormalOutside || 0,
+          shippingExpressOutside: data.shippingExpressOutside || 0,
+          isExpressOnly: !!data.isExpressOnly,
+        });
+
+        setMarketingData({
+          youtubeVideoId: data.youtubeVideoId || "",
+          highlights: data.statisticalHighlights || [],
+          howToUse: data.howToUseSteps || []
         });
 
         setLoading(false);
@@ -206,19 +202,20 @@ const handleSubmit = async () => {
         discountPrice: Number(w.discountPrice),
         stock: Number(w.stock),
       })),
-      shipping: {
-        weight: weightShippingData.weight,
-        weightUnit: weightShippingData.unit || "kg",
-        size: {
-          width: weightShippingData.dimensions.width,
-          height: weightShippingData.dimensions.height,
-          length: weightShippingData.dimensions.length,
-          unit: weightShippingData.dimensionsUnit || "inch",
-        },
-        insurance: weightShippingData.insurance || "optional",
-        shippingService: weightShippingData.shippingService || "standard",
-        preOrder: weightShippingData.preOrder || false,
-      },
+      shippingNormalTN: Number(weightShippingData.shippingNormalTN),
+      shippingExpressTN: Number(weightShippingData.shippingExpressTN),
+      shippingNormalOutside: Number(weightShippingData.shippingNormalOutside),
+      shippingExpressOutside: Number(weightShippingData.shippingExpressOutside),
+      isExpressOnly: weightShippingData.isExpressOnly,
+      youtubeVideoId: (() => {
+        const url = productDetails.videoUrl;
+        if (!url) return "";
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : url;
+      })(),
+      statisticalHighlights: marketingData.highlights,
+      howToUseSteps: marketingData.howToUse,
     };
 
     await updateProduct(productId, payload);
@@ -325,7 +322,20 @@ const handleSubmit = async () => {
         weightOptions={weightOptions}
         setWeightOptions={setWeightOptions}
         units={units}
+        shippingData={weightShippingData}
+        setShippingData={setWeightShippingData}
       />
+
+      {/* Marketing & Guide */}
+      <div className="mt-8 pt-8 border-t border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Marketing & Documentation</h2>
+        <MarketingStep
+          highlights={marketingData.highlights}
+          setHighlights={(val) => setMarketingData(prev => ({ ...prev, highlights: val }))}
+          howToUse={marketingData.howToUse}
+          setHowToUse={(val) => setMarketingData(prev => ({ ...prev, howToUse: val }))}
+        />
+      </div>
 
 <div className="mt-6 flex justify-end">
   <button

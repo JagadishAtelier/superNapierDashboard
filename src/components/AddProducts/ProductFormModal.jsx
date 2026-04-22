@@ -12,6 +12,7 @@ import ProductInfoStep from "./ProductInfoStep";
 import ProductDetailStep from "./ProductDetailStep";
 import ProductManagement from "./ProductManagementStep.jsx";
 import WeightShippings from "./WeightShippings.jsx";
+import MarketingStep from "./MarketingStep.jsx";
 
 const steps = [
   "Product Photo",
@@ -19,6 +20,7 @@ const steps = [
   "Product Details",
   "Product Management",
   "Weight & Shipping",
+  "Marketing & Guide",
 ];
 
 const isValidObjectId = (id) =>
@@ -71,6 +73,15 @@ const ProductFormModal = () => {
     unit: "kg",
     dimensions: { width: "", height: "", length: "" },
     weight: "",
+    shippingNormalTN: 0,
+    shippingExpressTN: 0,
+    shippingNormalOutside: 0,
+    shippingExpressOutside: 0,
+    isExpressOnly: false,
+  });
+  const [marketingData, setMarketingData] = useState({
+    highlights: [],
+    howToUse: []
   });
 
   // Handlers
@@ -184,6 +195,20 @@ const ProductFormModal = () => {
         weightOptions: payloadWeightOptions,
         SKU: productManagementData.sku,
         status: productManagementData.isActive ? "Active" : "Inactive",
+        shippingNormalTN: Number(weightShippingData.shippingNormalTN) || 0,
+        shippingExpressTN: Number(weightShippingData.shippingExpressTN) || 0,
+        shippingNormalOutside: Number(weightShippingData.shippingNormalOutside) || 0,
+        shippingExpressOutside: Number(weightShippingData.shippingExpressOutside) || 0,
+        isExpressOnly: weightShippingData.isExpressOnly,
+        youtubeVideoId: (() => {
+          const url = productDetails.videoUrl;
+          if (!url) return "";
+          const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+          const match = url.match(regExp);
+          return (match && match[2].length === 11) ? match[2] : url;
+        })(),
+        statisticalHighlights: marketingData.highlights,
+        howToUseSteps: marketingData.howToUse,
       };
 
       await createProduct(finalData);
@@ -258,8 +283,13 @@ const ProductFormModal = () => {
           setStorageInstructions={(val) => setProductDetails((prev) => ({ ...prev, storageInstructions: val }))}
         />
       )}
-
-      {currentStep === 3 && <ProductManagement onChange={setProductManagementData} />}
+      {currentStep === 3 && (
+        <ProductManagement
+          isActive={productManagementData.isActive}
+          sku={productManagementData.sku}
+          onChange={(val) => setProductManagementData(val)}
+        />
+      )}
 
       {currentStep === 4 && (
         <WeightShippings
@@ -268,7 +298,17 @@ const ProductFormModal = () => {
           addWeightOption={addWeightOption}
           updateWeightOption={updateWeightOption}
           removeWeightOption={removeWeightOption}
-          units={["g", "kg", "piece","pack"]}
+          units={["g", "kg", "piece", "pack"]}
+          shippingData={weightShippingData}
+          setShippingData={setWeightShippingData}
+        />
+      )}
+      {currentStep === 5 && (
+        <MarketingStep
+          highlights={marketingData.highlights}
+          setHighlights={(val) => setMarketingData(prev => ({ ...prev, highlights: val }))}
+          howToUse={marketingData.howToUse}
+          setHowToUse={(val) => setMarketingData(prev => ({ ...prev, howToUse: val }))}
         />
       )}
 

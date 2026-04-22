@@ -288,16 +288,16 @@ export default function ProductList() {
         <table className="min-w-[700px] w-full text-sm border-separate border-spacing-y-2">
           <thead className="text-left text-gray-600">
             <tr>
-              <th className="p-3">
+              {/* <th className="p-3">
                 <input type="checkbox" />
-              </th>
+              </th> */}
               <th className="p-3">Images</th>
               <th className="p-3">Name</th>
               <th className="p-3">Category</th>
               <th className="p-3">Product Id</th>
               <th className="p-3">Price/kg</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Actions</th>
+              <th className="p-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -316,9 +316,9 @@ export default function ProductList() {
                   key={index}
                   className="bg-white border rounded-lg shadow-sm hover:shadow-md transition"
                 >
-                  <td className="p-3">
+                  {/* <td className="p-3">
                     <input type="checkbox" />
-                  </td>
+                  </td> */}
 
                   {/* 🔹 Image */}
                   <td className="p-3">
@@ -356,7 +356,7 @@ export default function ProductList() {
                   </td>
 
                   <td className="p-4">
-                    <div className="flex flex-wrap items-center gap-2 ">
+                    <div className="flex flex-wrap justify-center gap-2 ">
                       <button
                         className="flex items-center text-indigo-600 hover:underline text-sm"
                         onClick={() => handleEditClick(product)}

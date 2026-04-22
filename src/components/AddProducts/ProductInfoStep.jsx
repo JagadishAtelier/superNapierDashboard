@@ -33,14 +33,6 @@ const ProductInfoStep = ({
 }) => {
   const [categories, setCategories] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formData, setFormData] = useState({
-    en: productName || "",
-    ta: tamilName || "",
-    hi: hindiName || "",
-    te: teluguName || "",
-    kn: kannadaName || "",
-    ml: malayalamName || "",
-  });
   const [isSyncing, setIsSyncing] = useState(false);
   const abortControllerRef = useRef(null);
   const cache = useRef({});
@@ -64,9 +56,7 @@ const ProductInfoStep = ({
     const cacheKey = `${text}_${targetLang}`;
     if (cache.current[cacheKey]) return cache.current[cacheKey];
 
-    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(
-      text
-    )}&itc=${targetLang}&num=1`;
+    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(text)}&itc=${targetLang}&num=1`;
 
     try {
       const response = await axios.get(url, {
@@ -80,58 +70,22 @@ const ProductInfoStep = ({
     }
   };
 
-  // Auto-fill missing languages when productName changes
-  useEffect(() => {
-    const autoFillLanguages = async () => {
-      if (!productName) return;
-      setIsSyncing(true);
-
-      const tasks = LANGUAGES.filter((l) => l.code !== "en").map(async (lang) => {
-        const result = await fetchTransliteration(productName, lang.apiCode);
-        return { code: lang.code, value: result };
-      });
-
-      const results = await Promise.all(tasks);
-
-      setFormData((prev) => {
-        const updated = { ...prev };
-        results.forEach((r) => {
-          updated[r.code] = r.value;
-          if (r.code === "ta") setTamilName(r.value);
-          if (r.code === "hi") setHindiName(r.value);
-          if (r.code === "te") setTeluguName(r.value);
-          if (r.code === "kn") setKannadaName(r.value);
-          if (r.code === "ml") setMalayalamName(r.value);
-        });
-        return updated;
-      });
-
-      setIsSyncing(false);
-    };
-
-    autoFillLanguages();
-  }, [productName]);
-
   const handleInputChange = async (langCode, value) => {
-    setFormData((prev) => ({ ...prev, [langCode]: value }));
-
-    // Update parent props
+    // 1. Update the specific field immediately
     if (langCode === "en") setProductName(value);
-    if (langCode === "ta") setTamilName(value);
-    if (langCode === "hi") setHindiName(value);
-    if (langCode === "te") setTeluguName(value);
-    if (langCode === "kn") setKannadaName(value);
-    if (langCode === "ml") setMalayalamName(value);
+    else if (langCode === "ta") setTamilName(value);
+    else if (langCode === "hi") setHindiName(value);
+    else if (langCode === "te") setTeluguName(value);
+    else if (langCode === "kn") setKannadaName(value);
+    else if (langCode === "ml") setMalayalamName(value);
 
+    // 2. Only auto-transliterate if changing English
     if (langCode !== "en") return;
 
     if (abortControllerRef.current) abortControllerRef.current.abort();
     abortControllerRef.current = new AbortController();
 
     if (!value.trim()) {
-      const emptyData = { en: "", ta: "", hi: "", te: "", kn: "", ml: "" };
-      setFormData(emptyData);
-      setProductName("");
       setTamilName("");
       setHindiName("");
       setTeluguName("");
@@ -141,27 +95,19 @@ const ProductInfoStep = ({
     }
 
     setIsSyncing(true);
-
     const tasks = LANGUAGES.filter((l) => l.code !== "en").map(async (lang) => {
       const result = await fetchTransliteration(value, lang.apiCode);
       return { code: lang.code, value: result };
     });
 
     const results = await Promise.all(tasks);
-
-    setFormData((prev) => {
-      const updated = { ...prev };
-      results.forEach((r) => {
-        updated[r.code] = r.value;
-        if (r.code === "ta") setTamilName(r.value);
-        if (r.code === "hi") setHindiName(r.value);
-        if (r.code === "te") setTeluguName(r.value);
-        if (r.code === "kn") setKannadaName(r.value);
-        if (r.code === "ml") setMalayalamName(r.value);
-      });
-      return updated;
+    results.forEach((r) => {
+      if (r.code === "ta") setTamilName(r.value);
+      if (r.code === "hi") setHindiName(r.value);
+      if (r.code === "te") setTeluguName(r.value);
+      if (r.code === "kn") setKannadaName(r.value);
+      if (r.code === "ml") setMalayalamName(r.value);
     });
-
     setIsSyncing(false);
   };
 
@@ -176,6 +122,16 @@ const ProductInfoStep = ({
     setCategories((prev) => [...prev, newCategory]);
     setCategory(newCategory._id);
     setShowCreateModal(false);
+  };
+
+  const getFieldValue = (code) => {
+      if (code === 'en') return productName;
+      if (code === 'ta') return tamilName;
+      if (code === 'hi') return hindiName;
+      if (code === 'te') return teluguName;
+      if (code === 'kn') return kannadaName;
+      if (code === 'ml') return malayalamName;
+      return "";
   };
 
   return (
@@ -241,17 +197,18 @@ const ProductInfoStep = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
             {LANGUAGES.map((lang) => {
               const isEnglish = lang.code === "en";
+              const value = getFieldValue(lang.code);
               return (
                 <div key={lang.code}>
                   <label className="text-sm font-semibold">{lang.label}</label>
                   <input
                     type="text"
-                    value={formData[lang.code]}
+                    value={value || ""}
                     onChange={(e) => handleInputChange(lang.code, e.target.value)}
                     placeholder={`Type ${lang.label}`}
-                    disabled={!isEnglish && !formData.en}
+                    disabled={!isEnglish && !productName}
                     className={`w-full px-4 py-2 border rounded-lg ${
-                      !isEnglish && !formData.en
+                      !isEnglish && !productName
                         ? "bg-gray-100 cursor-not-allowed"
                         : "focus:ring-2 focus:ring-blue-500"
                     }`}

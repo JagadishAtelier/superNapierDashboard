@@ -27,9 +27,10 @@ import BlogView from './pages/BlogPage/BlogView';
 import BlogEditor from './pages/BlogPage/BlogEditor';
 import CategoryForm from './pages/CategoryForm';
 import NewDashboard from './pages/NewDashboard/NewDashboard';
+import SettingsPage from './pages/SettingsPage';
 export default function App() {
- const [deferredPrompt, setDeferredPrompt] = useState(null);
-const [blogs, setBlogs] = useState([]);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [blogs, setBlogs] = useState([]);
   useEffect(() => {
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
@@ -41,7 +42,7 @@ const [blogs, setBlogs] = useState([]);
       window.deferredPWA = null;
     });
   }, []);
-  
+
   return (
     <Router>
       <Routes>
@@ -50,32 +51,33 @@ const [blogs, setBlogs] = useState([]);
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes */}
-        <Route element={<PrivateRoute />}>  
+        <Route element={<PrivateRoute />}>
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<NewDashboard />} />
             <Route path="/orders" element={<OrderPage />} />
-            <Route path="/orders/:orderId" element={<OrderDetailsPage/>} />
+            <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/Addproducts" element={<ProductFormModal />} />
             <Route path="/editproduct/:productId" element={<EditProduct />} />
             <Route path="/topsellers" element={<TopSellersList />} />
-            <Route path="/marketing" element={ <PushNotificationManager />} /> 
+            <Route path="/marketing" element={<PushNotificationManager />} />
             <Route path="/payments" element={<PaymentDashboard />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/categories" element={<CategoryPage />} />
             <Route path="/categories/form" element={<CategoryForm />} />
             <Route path="/categories/form/:id" element={<CategoryForm />} />
             <Route path="/Blogs" element={<Blog />} />
             <Route path="/Blogs/blog-view/:id" element={<BlogView />} />
-<Route
-  path="/Blogs/update"
-  element={<BlogEditor setBlogs={setBlogs} />}
-/>
+            <Route
+              path="/Blogs/update"
+              element={<BlogEditor setBlogs={setBlogs} />}
+            />
 
-<Route
-  path="/Blogs/update/:id"
-  element={<BlogEditor setBlogs={setBlogs} />}
-/>
+            <Route
+              path="/Blogs/update/:id"
+              element={<BlogEditor setBlogs={setBlogs} />}
+            />
             <Route path="*" element={<ComingSoonPage />} />
           </Route>
         </Route>

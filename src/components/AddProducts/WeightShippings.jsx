@@ -8,8 +8,14 @@ const WeightShippings = ({
   addWeightOption,
   updateWeightOption,
   removeWeightOption,
-  units = [], // e.g. ["g","kg","piece"] or [{value,label}]
+  units = [],
+  shippingData = {},
+  setShippingData,
 }) => {
+  const updateShipping = (field, value) => {
+    setShippingData(prev => ({ ...prev, [field]: value }));
+  };
+
   // normalize units into { value, label } objects
   const unitList = Array.isArray(units)
     ? units.map((u) => (typeof u === "string" ? { value: u, label: u } : u))
@@ -60,7 +66,85 @@ const WeightShippings = ({
   };
 
   return (
-    <div className="p-5 mt-8 relative border rounded-xl bg-white mx-5">
+    <div className="space-y-6">
+      {/* 🚢 Regional Shipping Fees */}
+      <div className="p-5 border rounded-xl bg-gray-50 mx-5 space-y-4">
+        <h2 className="text-base font-bold flex items-center text-[#1B5E20]">
+          <ChevronDown className="mr-2 size-4" /> Regional Shipping Fees (Product Level)
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Tamil Nadu Section */}
+          <div className="space-y-3 bg-white p-4 rounded-lg border border-green-100">
+            <h3 className="text-sm font-bold text-green-700 uppercase tracking-wider">Tamil Nadu</h3>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="text-xs text-gray-400 block mb-1">Normal Delivery (₹)</label>
+                <input
+                  type="number"
+                  value={shippingData.shippingNormalTN || ""}
+                  onChange={(e) => updateShipping("shippingNormalTN", e.target.value)}
+                  className="w-full h-10 border rounded-md px-3"
+                  placeholder="0"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-gray-400 block mb-1">Express Delivery (₹)</label>
+                <input
+                  type="number"
+                  value={shippingData.shippingExpressTN || ""}
+                  onChange={(e) => updateShipping("shippingExpressTN", e.target.value)}
+                  className="w-full h-10 border rounded-md px-3"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Outside TN Section */}
+          <div className="space-y-3 bg-white p-4 rounded-lg border border-orange-100">
+            <h3 className="text-sm font-bold text-orange-700 uppercase tracking-wider">Outside Tamil Nadu</h3>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="text-xs text-gray-400 block mb-1">Normal Delivery (₹)</label>
+                <input
+                  type="number"
+                  value={shippingData.shippingNormalOutside || ""}
+                  onChange={(e) => updateShipping("shippingNormalOutside", e.target.value)}
+                  className="w-full h-10 border rounded-md px-3"
+                  placeholder="0"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-gray-400 block mb-1">Express Delivery (₹)</label>
+                <input
+                  type="number"
+                  value={shippingData.shippingExpressOutside || ""}
+                  onChange={(e) => updateShipping("shippingExpressOutside", e.target.value)}
+                  className="w-full h-10 border rounded-md px-3"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 pt-2">
+          <input
+            type="checkbox"
+            id="isExpressOnly"
+            checked={shippingData.isExpressOnly || false}
+            onChange={(e) => updateShipping("isExpressOnly", e.target.checked)}
+            className="w-4 h-4 text-green-600 rounded"
+          />
+          <label htmlFor="isExpressOnly" className="text-sm font-medium text-gray-700">
+            Apply <strong>Express Delivery Only</strong> for this product
+          </label>
+        </div>
+      </div>
+
+      {/* ⚖️ Weight Options */}
+      <div className="p-5 relative border rounded-xl bg-white mx-5">
       <h2 className="text-base font-medium border-b pb-5 flex items-center">
         <ChevronDown className="mr-2 size-4" /> Weight Options
       </h2>
@@ -139,6 +223,7 @@ const WeightShippings = ({
         </button>
       </div>
     </div>
+  </div>
   );
 };
 
