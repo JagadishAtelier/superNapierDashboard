@@ -14,6 +14,7 @@ import {
   ChevronUp,
   FileText,
   Settings,
+  Globe,
 } from "lucide-react";
 
 export default function Sidebar({ setSidebarOpen }) {
@@ -196,6 +197,23 @@ export default function Sidebar({ setSidebarOpen }) {
         >
           <FileText />
           {!collapsed && <span>Blogs</span>}
+        </NavLink>
+
+        {/* Page CMS */}
+        <NavLink
+          to="/cms/pages"
+          onClick={handleNavClick}
+          className={({ isActive }) =>
+            `flex items-center gap-2 ${collapsed ? "justify-center" : "ps-3 pe-5"
+            } py-3 rounded-[13px] rounded-tr-[0px] rounded-r-[0px] transition relative ${isActive
+              ? "text-[#0a2613] font-medium active-tab active-tab-bg"
+              : "hover:bg-[#fafcf8] hover:text-[#0a2613]"
+            }`
+          }
+          title={collapsed ? "About Us & Partnership" : undefined}
+        >
+          <Globe />
+          {!collapsed && <span>CMS</span>}
         </NavLink>
 
         {/* Settings */}

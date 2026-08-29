@@ -2,10 +2,20 @@ import React, { useState } from 'react';
 import { Plus, Trash2, BarChart2, BookOpen, Upload, Loader2, X } from 'lucide-react';
 import { uploadToCloudinary } from '../../api/imageUpload';
 
+const LANGUAGES = [
+    { code: "en", label: "English" },
+    { code: "ta", label: "Tamil" },
+    { code: "hi", label: "Hindi" },
+    { code: "te", label: "Telugu" },
+    { code: "kn", label: "Kannada" },
+    { code: "ml", label: "Malayalam" },
+];
+
 const MarketingStep = ({ 
     highlights, setHighlights, 
     howToUse, setHowToUse 
 }) => {
+    const [activeLang, setActiveLang] = useState("en");
     const [uploadingIndex, setUploadingIndex] = useState(null); // 'h-0' or 's-0'
 
     const handleFileChange = async (e, type, index) => {
@@ -30,13 +40,38 @@ const MarketingStep = ({
     };
 
     const addHighlight = () => {
-        setHighlights([...highlights, { title: '', description: '', image: '' }]);
+        setHighlights([...highlights, { 
+            title: { en: '', ta: '', hi: '', te: '', kn: '', ml: '' }, 
+            description: { en: '', ta: '', hi: '', te: '', kn: '', ml: '' }, 
+            image: '' 
+        }]);
     };
 
     const updateHighlight = (index, field, value) => {
         const newHighlights = [...highlights];
-        newHighlights[index][field] = value;
+        if (field === 'image') {
+            newHighlights[index][field] = value;
+        } else {
+            if (typeof newHighlights[index][field] === 'string') {
+                newHighlights[index][field] = {
+                    en: newHighlights[index][field],
+                    ta: '', hi: '', te: '', kn: '', ml: ''
+                };
+            }
+            if (!newHighlights[index][field]) {
+                newHighlights[index][field] = { en: '', ta: '', hi: '', te: '', kn: '', ml: '' };
+            }
+            newHighlights[index][field][activeLang] = value;
+        }
         setHighlights(newHighlights);
+    };
+
+    const getHighlightValue = (h, field) => {
+        if (!h[field]) return '';
+        if (typeof h[field] === 'string') {
+            return activeLang === 'en' ? h[field] : '';
+        }
+        return h[field][activeLang] || '';
     };
 
     const removeHighlight = (index) => {
@@ -44,34 +79,111 @@ const MarketingStep = ({
     };
 
     const addStep = () => {
-        setHowToUse([...howToUse, { title: '', heading: '', description: '', image: '', bullets: [''] }]);
+        setHowToUse([...howToUse, { 
+            title: { en: '', ta: '', hi: '', te: '', kn: '', ml: '' }, 
+            heading: { en: '', ta: '', hi: '', te: '', kn: '', ml: '' }, 
+            description: { en: '', ta: '', hi: '', te: '', kn: '', ml: '' }, 
+            image: '', 
+            bullets: { en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: [''] } 
+        }]);
     };
 
     const updateStep = (index, field, value) => {
         const newSteps = [...howToUse];
-        newSteps[index][field] = value;
+        if (field === 'image') {
+            newSteps[index][field] = value;
+        } else {
+            if (typeof newSteps[index][field] === 'string') {
+                newSteps[index][field] = {
+                    en: newSteps[index][field],
+                    ta: '', hi: '', te: '', kn: '', ml: ''
+                };
+            }
+            if (!newSteps[index][field]) {
+                newSteps[index][field] = { en: '', ta: '', hi: '', te: '', kn: '', ml: '' };
+            }
+            newSteps[index][field][activeLang] = value;
+        }
         setHowToUse(newSteps);
+    };
+
+    const getStepValue = (s, field) => {
+        if (!s[field]) return '';
+        if (typeof s[field] === 'string') {
+            return activeLang === 'en' ? s[field] : '';
+        }
+        return s[field][activeLang] || '';
     };
 
     const removeStep = (index) => {
         setHowToUse(howToUse.filter((_, i) => i !== index));
     };
 
+    const getBulletsList = (s) => {
+        if (!s.bullets) return [''];
+        if (Array.isArray(s.bullets)) {
+            return activeLang === 'en' ? s.bullets : [''];
+        }
+        return s.bullets[activeLang] || [''];
+    };
+
     const addBullet = (stepIndex) => {
         const newSteps = [...howToUse];
-        newSteps[stepIndex].bullets.push('');
+        let bullets = newSteps[stepIndex].bullets;
+        if (Array.isArray(bullets)) {
+            newSteps[stepIndex].bullets = {
+                en: [...bullets],
+                ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+        } else if (!bullets) {
+            newSteps[stepIndex].bullets = {
+                en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+        }
+        if (!newSteps[stepIndex].bullets[activeLang]) {
+            newSteps[stepIndex].bullets[activeLang] = [''];
+        }
+        newSteps[stepIndex].bullets[activeLang].push('');
         setHowToUse(newSteps);
     };
 
     const updateBullet = (stepIndex, bulletIndex, value) => {
         const newSteps = [...howToUse];
-        newSteps[stepIndex].bullets[bulletIndex] = value;
+        let bullets = newSteps[stepIndex].bullets;
+        if (Array.isArray(bullets)) {
+            newSteps[stepIndex].bullets = {
+                en: [...bullets],
+                ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+        } else if (!bullets) {
+            newSteps[stepIndex].bullets = {
+                en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+        }
+        if (!newSteps[stepIndex].bullets[activeLang]) {
+            newSteps[stepIndex].bullets[activeLang] = [''];
+        }
+        newSteps[stepIndex].bullets[activeLang][bulletIndex] = value;
         setHowToUse(newSteps);
     };
 
     const removeBullet = (stepIndex, bulletIndex) => {
         const newSteps = [...howToUse];
-        newSteps[stepIndex].bullets = newSteps[stepIndex].bullets.filter((_, i) => i !== bulletIndex);
+        let bullets = newSteps[stepIndex].bullets;
+        if (Array.isArray(bullets)) {
+            newSteps[stepIndex].bullets = {
+                en: [...bullets],
+                ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+        } else if (!bullets) {
+            newSteps[stepIndex].bullets = {
+                en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+        }
+        if (!newSteps[stepIndex].bullets[activeLang]) {
+            newSteps[stepIndex].bullets[activeLang] = [''];
+        }
+        newSteps[stepIndex].bullets[activeLang] = newSteps[stepIndex].bullets[activeLang].filter((_, i) => i !== bulletIndex);
         setHowToUse(newSteps);
     };
 
@@ -104,13 +216,30 @@ const MarketingStep = ({
                     )}
                     <input type="file" className="hidden" onChange={onUpload} accept="image/*" disabled={isUploading} />
                 </label>
-            )
-            }
+            )}
         </div>
     );
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Language Selector Tabs */}
+            <div className="flex space-x-2 border-b pb-2">
+                {LANGUAGES.map((lang) => (
+                    <button
+                        key={lang.code}
+                        type="button"
+                        className={`px-4 py-2 text-sm font-semibold rounded-t-lg border-b-2 transition-colors ${
+                            activeLang === lang.code
+                                ? "border-green-600 text-green-700 bg-green-50/50 font-black"
+                                : "border-transparent text-gray-500 hover:text-gray-700"
+                        }`}
+                        onClick={() => setActiveLang(lang.code)}
+                    >
+                        {lang.label}
+                    </button>
+                ))}
+            </div>
+
             {/* Statistical Highlights */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
@@ -147,14 +276,14 @@ const MarketingStep = ({
 
                             <input
                                 type="text"
-                                placeholder="Title (e.g. 98% Germination)"
-                                value={h.title}
+                                placeholder={`Title in ${LANGUAGES.find(l => l.code === activeLang).label} (e.g. 98% Germination)`}
+                                value={getHighlightValue(h, 'title')}
                                 onChange={(e) => updateHighlight(i, 'title', e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-1 focus:ring-green-500 font-bold"
                             />
                             <textarea
-                                placeholder="Description"
-                                value={h.description}
+                                placeholder={`Description in ${LANGUAGES.find(l => l.code === activeLang).label}`}
+                                value={getHighlightValue(h, 'description')}
                                 onChange={(e) => updateHighlight(i, 'description', e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-1 focus:ring-green-500 h-20 text-sm flex-grow"
                             />
@@ -208,21 +337,21 @@ const MarketingStep = ({
                                 <div className="space-y-4">
                                     <input
                                         type="text"
-                                        placeholder="Step Title (e.g. Land Preparation)"
-                                        value={s.title}
+                                        placeholder={`Step Title in ${LANGUAGES.find(l => l.code === activeLang).label} (e.g. Land Preparation)`}
+                                        value={getStepValue(s, 'title')}
                                         onChange={(e) => updateStep(i, 'title', e.target.value)}
                                         className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-1 focus:ring-green-500 font-bold"
                                     />
                                     <input
                                         type="text"
-                                        placeholder="Heading (e.g. Creating the perfect foundation)"
-                                        value={s.heading}
+                                        placeholder={`Heading in ${LANGUAGES.find(l => l.code === activeLang).label} (e.g. Creating the perfect foundation)`}
+                                        value={getStepValue(s, 'heading')}
                                         onChange={(e) => updateStep(i, 'heading', e.target.value)}
                                         className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-1 focus:ring-green-500"
                                     />
                                     <textarea
-                                        placeholder="Detailed Description"
-                                        value={s.description}
+                                        placeholder={`Detailed Description in ${LANGUAGES.find(l => l.code === activeLang).label}`}
+                                        value={getStepValue(s, 'description')}
                                         onChange={(e) => updateStep(i, 'description', e.target.value)}
                                         className="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:ring-1 focus:ring-green-500 h-24 text-sm"
                                     />
@@ -230,12 +359,14 @@ const MarketingStep = ({
                             </div>
 
                             <div className="space-y-2 pt-4 border-t border-gray-200/50">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Bullet Points</label>
-                                {s.bullets.map((b, bi) => (
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                    Bullet Points ({LANGUAGES.find(l => l.code === activeLang).label})
+                                </label>
+                                {getBulletsList(s).map((b, bi) => (
                                     <div key={bi} className="flex gap-2">
                                         <input
                                             type="text"
-                                            placeholder="Bullet point..."
+                                            placeholder={`Bullet point in ${LANGUAGES.find(l => l.code === activeLang).label}...`}
                                             value={b}
                                             onChange={(e) => updateBullet(i, bi, e.target.value)}
                                             className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 outline-none focus:ring-1 focus:ring-green-500 text-sm"

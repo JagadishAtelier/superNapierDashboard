@@ -93,13 +93,13 @@ export default function ProductList() {
   // ✅ Export filtered data to Excel
   const exportToExcel = () => {
     const data = filteredProducts.map((p) => ({
-      ID: p._id,
-      Name: p.name?.en,
-      Category: p.category?.name?.en || "N/A",
-      Stock: p.stock || "N/A",
+      ID: p.productId || p._id,
+      Name: typeof p.name === "object" ? (p.name?.en || "Product") : (p.name || "Product"),
+      Category: p.category?.name?.en || p.category?.name || "N/A",
+      Stock: p.stock !== undefined ? p.stock : "N/A",
       Price:
-        p.weightOptions.find((w) => w.weight === 1000)?.price ||
-        p.weightOptions[0]?.price ||
+        p.weightOptions?.find((w) => w.weight === 1000)?.price ||
+        p.weightOptions?.[0]?.price ||
         "N/A",
       Status: p.status,
     }));
@@ -120,12 +120,12 @@ export default function ProductList() {
     autoTable(doc, {
       head: [["ID", "Name", "Category", "Stock", "Price", "Status"]],
       body: filteredProducts.map((p) => [
-        p._id,
-          p.name?.en,
-  p.category?.name?.en || "N/A",
-        p.stock || "N/A",
-        p.weightOptions.find((w) => w.weight === 1000)?.price ||
-          p.weightOptions[0]?.price ||
+        p.productId || p._id,
+        typeof p.name === "object" ? (p.name?.en || "Product") : (p.name || "Product"),
+        p.category?.name?.en || p.category?.name || "N/A",
+        p.stock !== undefined ? p.stock : "N/A",
+        p.weightOptions?.find((w) => w.weight === 1000)?.price ||
+          p.weightOptions?.[0]?.price ||
           "N/A",
         p.status,
       ]),
@@ -295,7 +295,7 @@ export default function ProductList() {
               <th className="p-3">Name</th>
               <th className="p-3">Category</th>
               <th className="p-3">Product Id</th>
-              <th className="p-3">Price/kg</th>
+              <th className="p-3">Price/Unit</th>
               <th className="p-3">Status</th>
               <th className="p-3 text-center">Actions</th>
             </tr>

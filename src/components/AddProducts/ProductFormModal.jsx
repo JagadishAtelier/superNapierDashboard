@@ -53,7 +53,8 @@ const ProductFormModal = () => {
     teluguDescription: "",
     kannadaDescription: "",
     malayalamDescription: "",
-    videoUrl: "",
+    productVideoUrl: { en: "", ta: "", hi: "", te: "", kn: "", ml: "" },
+    howToPlantVideoUrl: { en: "", ta: "", hi: "", te: "", kn: "", ml: "" },
     cutType: [],
     flavor: [],
     shelfLife: "",
@@ -185,7 +186,8 @@ const ProductFormModal = () => {
         images: uploadedPhotoUrls,
         name: namePayload,
         category: productInfo.category,
-        productVideoUrl: productDetails.videoUrl,
+        productVideoUrl: productDetails.productVideoUrl,
+        howToPlantVideoUrl: productDetails.howToPlantVideoUrl,
         description: descriptionPayload,
         cutType: Array.isArray(productDetails.cutType) ? productDetails.cutType : [],
         flavor: productDetails.flavor,
@@ -201,14 +203,47 @@ const ProductFormModal = () => {
         shippingExpressOutside: Number(weightShippingData.shippingExpressOutside) || 0,
         isExpressOnly: weightShippingData.isExpressOnly,
         youtubeVideoId: (() => {
-          const url = productDetails.videoUrl;
+          const url = productDetails.productVideoUrl?.en || "";
           if (!url) return "";
           const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
           const match = url.match(regExp);
           return (match && match[2].length === 11) ? match[2] : url;
         })(),
-        statisticalHighlights: marketingData.highlights,
-        howToUseSteps: marketingData.howToUse,
+        statisticalHighlights: (marketingData.highlights || []).map(h => ({
+          title: typeof h.title === 'object' && h.title !== null ? h.title : { en: h.title || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+          description: typeof h.description === 'object' && h.description !== null ? h.description : { en: h.description || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+          image: h.image || ''
+        })),
+        howToUseSteps: (marketingData.howToUse || []).map(s => {
+          let bullets = s.bullets;
+          if (Array.isArray(bullets)) {
+            bullets = {
+              en: bullets,
+              ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+          } else if (!bullets) {
+            bullets = {
+              en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+          } else {
+            // Ensure all languages are initialized
+            bullets = {
+              en: Array.isArray(bullets.en) ? bullets.en : [''],
+              ta: Array.isArray(bullets.ta) ? bullets.ta : [''],
+              hi: Array.isArray(bullets.hi) ? bullets.hi : [''],
+              te: Array.isArray(bullets.te) ? bullets.te : [''],
+              kn: Array.isArray(bullets.kn) ? bullets.kn : [''],
+              ml: Array.isArray(bullets.ml) ? bullets.ml : [''],
+            };
+          }
+          return {
+            title: typeof s.title === 'object' && s.title !== null ? s.title : { en: s.title || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+            heading: typeof s.heading === 'object' && s.heading !== null ? s.heading : { en: s.heading || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+            description: typeof s.description === 'object' && s.description !== null ? s.description : { en: s.description || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+            image: s.image || '',
+            bullets: bullets
+          };
+        }),
       };
 
       await createProduct(finalData);
@@ -267,8 +302,20 @@ const ProductFormModal = () => {
           setKannadaDescription={(val) => setProductDetails((prev) => ({ ...prev, kannadaDescription: val }))}
           malayalamDescription={productDetails.malayalamDescription}
           setMalayalamDescription={(val) => setProductDetails((prev) => ({ ...prev, malayalamDescription: val }))}
-          videoUrl={productDetails.videoUrl}
-          setVideoUrl={(val) => setProductDetails((prev) => ({ ...prev, videoUrl: val }))}
+          productVideoUrl={productDetails.productVideoUrl}
+          setProductVideoUrl={(lang, val) =>
+            setProductDetails((prev) => ({
+              ...prev,
+              productVideoUrl: { ...prev.productVideoUrl, [lang]: val },
+            }))
+          }
+          howToPlantVideoUrl={productDetails.howToPlantVideoUrl}
+          setHowToPlantVideoUrl={(lang, val) =>
+            setProductDetails((prev) => ({
+              ...prev,
+              howToPlantVideoUrl: { ...prev.howToPlantVideoUrl, [lang]: val },
+            }))
+          }
           cutType={productDetails.cutType}
           setCutType={(val) =>
             setProductDetails((prev) => ({ ...prev, cutType: Array.isArray(val) ? val : [] }))

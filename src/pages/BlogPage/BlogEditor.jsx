@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { createBlog, updateBlog, getBlogById } from "../../api/blogApi";
+import { getAllProducts } from "../../api/productApi";
 import toast from "react-hot-toast";
 
 const BlogEditor = () => {
@@ -28,14 +29,34 @@ const BlogEditor = () => {
   const isEdit = Boolean(id);
 
   const [images, setImages] = useState([]);
+  const [allProductsList, setAllProductsList] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
     date: "",
     excerpt: "",
     content: "",
     image: [],
+    metaKeywords: "",
+    taggedProducts: [],
+    whatsappCTA: false,
+    whatsappCTAText: "Inquire on WhatsApp",
+    whatsappCTAMessage: "",
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await getAllProducts();
+        if (res && res.data) {
+          setAllProductsList(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to load products in editor", err);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const maxLength = 2000;
 
@@ -56,6 +77,11 @@ const BlogEditor = () => {
           excerpt: blog.excerpt || "",
           content: blog.content || "",
           image: blog.image || [],
+          metaKeywords: blog.metaKeywords || "",
+          taggedProducts: blog.taggedProducts ? blog.taggedProducts.map(p => typeof p === 'object' ? p._id : p) : [],
+          whatsappCTA: blog.whatsappCTA || false,
+          whatsappCTAText: blog.whatsappCTAText || "Inquire on WhatsApp",
+          whatsappCTAMessage: blog.whatsappCTAMessage || "",
         });
         if (blog.image?.length) {
           setImages(blog.image.map((img) => ({ preview: img })));
@@ -237,6 +263,8 @@ const BlogEditor = () => {
           </div>
         </div>
 
+
+
         {/* Thumbnail Uploader */}
         <div className="relative mb-6">
           <div className="rounded-lg border p-5 bg-white">
@@ -336,8 +364,112 @@ const BlogEditor = () => {
           onInput={handleEditorInput}
           contentEditable
           data-placeholder="Write your blog..."
-          className="editor w-full h-[350px] p-6 rounded-xl border bg-white outline-none overflow-auto"
+          className="editor w-full h-[350px] p-6 rounded-xl mb-6 border bg-white outline-none overflow-auto"
         />
+
+        {/* SEO & Integration Settings */}
+        <div className="bg-white rounded-xl border p-5 space-y-5">
+          <h3 className="font-semibold text-gray-800 border-b pb-3 flex items-center gap-2">
+            <Lightbulb className="text-yellow-500 h-5 w-5" /> Settings & Integrations
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* SEO Meta Keywords */}
+            <div className="flex flex-col gap-1 w-full">
+              <label className="text-sm font-medium text-gray-700">
+                SEO Meta Keywords (comma-separated)
+              </label>
+              <input
+                type="text"
+                name="metaKeywords"
+                placeholder="e.g. grass, super napier, animal feed"
+                value={formData.metaKeywords}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+              />
+            </div>
+
+            {/* Product Tagging Selector */}
+            <div className="flex flex-col gap-1 w-full">
+              <label className="text-sm font-medium text-gray-700">
+                Tag Products
+              </label>
+              <div className="border border-gray-300 rounded-lg p-2.5 max-h-36 overflow-y-auto space-y-2 bg-gray-50">
+                {allProductsList.length > 0 ? (
+                  allProductsList.map((prod) => {
+                    const name = typeof prod.name === "object" ? prod.name.en : prod.name;
+                    const isChecked = formData.taggedProducts.includes(prod._id);
+                    return (
+                      <label key={prod._id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                taggedProducts: [...prev.taggedProducts, prod._id]
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                taggedProducts: prev.taggedProducts.filter(id => id !== prod._id)
+                              }));
+                            }
+                          }}
+                          className="w-4 h-4 rounded text-indigo-600 focus:ring-0"
+                        />
+                        <span>{name}</span>
+                      </label>
+                    );
+                  })
+                ) : (
+                  <p className="text-xs text-gray-400">No products found</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <label className="flex items-center gap-2 cursor-pointer font-medium text-gray-800 text-sm select-none">
+              <input
+                type="checkbox"
+                name="whatsappCTA"
+                checked={formData.whatsappCTA}
+                onChange={(e) => setFormData(prev => ({ ...prev, whatsappCTA: e.target.checked }))}
+                className="w-4 h-4 rounded text-indigo-600 focus:ring-0"
+              />
+              <span>Enable WhatsApp Query CTA Button</span>
+            </label>
+
+            {formData.whatsappCTA && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4 animate-in fade-in duration-200">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-semibold text-gray-600">WhatsApp Button Text</label>
+                  <input
+                    type="text"
+                    name="whatsappCTAText"
+                    value={formData.whatsappCTAText}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                    placeholder="e.g. Inquire on WhatsApp"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-semibold text-gray-600">WhatsApp Custom Message</label>
+                  <input
+                    type="text"
+                    name="whatsappCTAMessage"
+                    value={formData.whatsappCTAMessage}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                    placeholder="e.g. Hi, I have a query about Super Napier grass..."
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Footer */}
         <div className="flex justify-between mt-4">

@@ -1,6 +1,4 @@
-import axios from 'axios';
+import api from "./authApi";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-export const getSettings = () => axios.get(`${API_URL}/settings`);
-export const updateSettings = (data) => axios.put(`${API_URL}/settings`, data);
+export const getSettings = () => api.get("/settings");
+export const updateSettings = (data) => api.put("/settings", data);

@@ -28,6 +28,8 @@ import BlogEditor from './pages/BlogPage/BlogEditor';
 import CategoryForm from './pages/CategoryForm';
 import NewDashboard from './pages/NewDashboard/NewDashboard';
 import SettingsPage from './pages/SettingsPage';
+import DistributionMapPage from './pages/DistributionMapPage';
+import PageCms from './pages/PageCms/PageCms';
 export default function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -64,7 +66,9 @@ export default function App() {
             <Route path="/payments" element={<PaymentDashboard />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/cms/pages" element={<PageCms />} />
             <Route path="/categories" element={<CategoryPage />} />
+            <Route path="/distribution-map" element={<DistributionMapPage />} />
             <Route path="/categories/form" element={<CategoryForm />} />
             <Route path="/categories/form/:id" element={<CategoryForm />} />
             <Route path="/Blogs" element={<Blog />} />

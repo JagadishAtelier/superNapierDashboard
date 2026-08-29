@@ -24,8 +24,10 @@ const ProductDetailStep = ({
   setKannadaDescription,
   malayalamDescription,
   setMalayalamDescription,
-  videoUrl,
-  setVideoUrl,
+  productVideoUrl,
+  setProductVideoUrl,
+  howToPlantVideoUrl,
+  setHowToPlantVideoUrl,
 }) => {
   const [formData, setFormData] = useState({
     en: description || "",
@@ -186,14 +188,30 @@ const ProductDetailStep = ({
           {/* Product Video */}
           <div className="flex flex-col xl:flex-row items-start mt-5">
             <div className="w-full xl:w-64 xl:mr-10">
-              <div className="font-medium">Product Video</div>
+              <div className="font-medium">Product Video ({LANGUAGES.find(l => l.code === activeLang)?.label})</div>
             </div>
             <div className="mt-3 xl:mt-0 flex-1 w-full">
               <input
                 type="url"
-                placeholder="Add YouTube video link of product"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder={`Add YouTube video link of product in ${LANGUAGES.find(l => l.code === activeLang)?.label}`}
+                value={productVideoUrl?.[activeLang] || ""}
+                onChange={(e) => setProductVideoUrl(activeLang, e.target.value)}
+                className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
+          </div>
+
+          {/* How to Plant Video */}
+          <div className="flex flex-col xl:flex-row items-start mt-5">
+            <div className="w-full xl:w-64 xl:mr-10">
+              <div className="font-medium">How to Plant Video ({LANGUAGES.find(l => l.code === activeLang)?.label})</div>
+            </div>
+            <div className="mt-3 xl:mt-0 flex-1 w-full">
+              <input
+                type="url"
+                placeholder={`Add YouTube video link of How to Plant guide in ${LANGUAGES.find(l => l.code === activeLang)?.label}`}
+                value={howToPlantVideoUrl?.[activeLang] || ""}
+                onChange={(e) => setHowToPlantVideoUrl(activeLang, e.target.value)}
                 className="w-full rounded-md border px-3 py-2 bg-white text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
               />
             </div>

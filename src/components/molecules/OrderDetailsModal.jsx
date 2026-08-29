@@ -106,12 +106,29 @@ export default function OrderDetailsModal({ open, onClose, order }) {
     const leftMargin = 7;
     const lineHeight = 7;
 
-    doc.setFontSize(16);
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    // use order.orderId or order._id or order.id
+    doc.text("INVOICE", leftMargin, y);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
     const orderIdText = order.orderId || order.orderId === 0 ? order.orderId : order.id || order._id || "";
-    doc.text(`Order Invoice: ${orderIdText}`, leftMargin, y);
-    y += 12;
+    doc.text(`Order ID: ${orderIdText}`, leftMargin, y + 6);
+    doc.text(`Date: ${order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}`, leftMargin, y + 12);
+
+    // Business Details on top right
+    doc.setFont("helvetica", "bold");
+    doc.text("Seller Details:", 115, y);
+    doc.setFont("helvetica", "normal");
+    doc.text("Ponni seeds Pvt Ltd,", 115, y + 5);
+    doc.text("C/o virudhambal,", 115, y + 10);
+    doc.text("220/A2 Raman Street, Salem main road,", 115, y + 15);
+    doc.text("Ramachandran pettai, Vriddhachalam - 606001.", 115, y + 20);
+    doc.text("Phone: 7639444670", 115, y + 25);
+    doc.setFont("helvetica", "bold");
+    doc.text("GST No: 33AAOCP3989N1ZH", 115, y + 30);
+
+    y += 38;
 
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");

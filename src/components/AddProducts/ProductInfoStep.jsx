@@ -42,7 +42,7 @@ const ProductInfoStep = ({
     const fetchCategories = async () => {
       try {
         const data = await getAllCategories();
-        setCategories(data);
+        setCategories(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error fetching categories", err);
       }
@@ -174,7 +174,7 @@ const ProductInfoStep = ({
               className="h-10 w-full rounded-md border px-3 py-2 pr-8"
             >
               <option value="">Select a Category</option>
-              {categories.map((cat) => (
+              {Array.isArray(categories) && categories.map((cat) => (
                 <option key={cat._id} value={cat._id}>
                   {cat.name.en || "Unnamed"}
                 </option>

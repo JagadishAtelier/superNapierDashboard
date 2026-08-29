@@ -35,7 +35,8 @@ const [saving, setSaving] = useState(false);
     teluguDescription: "", // Telugu
     kannadaDescription: "",// Kannada
     malayalamDescription: "", // Malayalam
-    videoUrl: "",
+    productVideoUrl: { en: "", ta: "", hi: "", te: "", kn: "", ml: "" },
+    howToPlantVideoUrl: { en: "", ta: "", hi: "", te: "", kn: "", ml: "" },
     cutType: "",
     flavor: [],
     shelfLife: "",
@@ -90,7 +91,30 @@ const [saving, setSaving] = useState(false);
           teluguDescription: data.description?.te || "",
           kannadaDescription: data.description?.kn || "",
           malayalamDescription: data.description?.ml || "",
-          videoUrl: data.productVideoUrl || "",
+          productVideoUrl: (() => {
+            const val = data.productVideoUrl;
+            if (typeof val === "string") return { en: val, ta: "", hi: "", te: "", kn: "", ml: "" };
+            return {
+              en: val?.en || "",
+              ta: val?.ta || "",
+              hi: val?.hi || "",
+              te: val?.te || "",
+              kn: val?.kn || "",
+              ml: val?.ml || "",
+            };
+          })(),
+          howToPlantVideoUrl: (() => {
+            const val = data.howToPlantVideoUrl;
+            if (typeof val === "string") return { en: val, ta: "", hi: "", te: "", kn: "", ml: "" };
+            return {
+              en: val?.en || "",
+              ta: val?.ta || "",
+              hi: val?.hi || "",
+              te: val?.te || "",
+              kn: val?.kn || "",
+              ml: val?.ml || "",
+            };
+          })(),
           cutType: data.cutType || "",
           flavor: Array.isArray(data.flavor) ? data.flavor : [],
           shelfLife: data.shelfLife || "",
@@ -132,10 +156,83 @@ const [saving, setSaving] = useState(false);
           isExpressOnly: !!data.isExpressOnly,
         });
 
+        const normalizedHighlights = (data.statisticalHighlights || []).map(h => ({
+          title: typeof h.title === 'object' && h.title !== null ? {
+            en: h.title.en || "",
+            ta: h.title.ta || "",
+            hi: h.title.hi || "",
+            te: h.title.te || "",
+            kn: h.title.kn || "",
+            ml: h.title.ml || "",
+          } : { en: h.title || "", ta: "", hi: "", te: "", kn: "", ml: "" },
+          description: typeof h.description === 'object' && h.description !== null ? {
+            en: h.description.en || "",
+            ta: h.description.ta || "",
+            hi: h.description.hi || "",
+            te: h.description.te || "",
+            kn: h.description.kn || "",
+            ml: h.description.ml || "",
+          } : { en: h.description || "", ta: "", hi: "", te: "", kn: "", ml: "" },
+          image: h.image || "",
+          _id: h._id
+        }));
+
+        const normalizedHowToUse = (data.howToUseSteps || []).map(s => {
+          let bullets = s.bullets;
+          if (Array.isArray(bullets)) {
+            bullets = {
+              en: bullets,
+              ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+          } else if (!bullets) {
+            bullets = {
+              en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+            };
+          } else {
+            bullets = {
+              en: Array.isArray(bullets.en) ? bullets.en : [''],
+              ta: Array.isArray(bullets.ta) ? bullets.ta : [''],
+              hi: Array.isArray(bullets.hi) ? bullets.hi : [''],
+              te: Array.isArray(bullets.te) ? bullets.te : [''],
+              kn: Array.isArray(bullets.kn) ? bullets.kn : [''],
+              ml: Array.isArray(bullets.ml) ? bullets.ml : [''],
+            };
+          }
+          return {
+            title: typeof s.title === 'object' && s.title !== null ? {
+              en: s.title.en || "",
+              ta: s.title.ta || "",
+              hi: s.title.hi || "",
+              te: s.title.te || "",
+              kn: s.title.kn || "",
+              ml: s.title.ml || "",
+            } : { en: s.title || "", ta: "", hi: "", te: "", kn: "", ml: "" },
+            heading: typeof s.heading === 'object' && s.heading !== null ? {
+              en: s.heading.en || "",
+              ta: s.heading.ta || "",
+              hi: s.heading.hi || "",
+              te: s.heading.te || "",
+              kn: s.heading.kn || "",
+              ml: s.heading.ml || "",
+            } : { en: s.heading || "", ta: "", hi: "", te: "", kn: "", ml: "" },
+            description: typeof s.description === 'object' && s.description !== null ? {
+              en: s.description.en || "",
+              ta: s.description.ta || "",
+              hi: s.description.hi || "",
+              te: s.description.te || "",
+              kn: s.description.kn || "",
+              ml: s.description.ml || "",
+            } : { en: s.description || "", ta: "", hi: "", te: "", kn: "", ml: "" },
+            image: s.image || "",
+            bullets: bullets,
+            _id: s._id
+          };
+        });
+
         setMarketingData({
           youtubeVideoId: data.youtubeVideoId || "",
-          highlights: data.statisticalHighlights || [],
-          howToUse: data.howToUseSteps || []
+          highlights: normalizedHighlights,
+          howToUse: normalizedHowToUse
         });
 
         setLoading(false);
@@ -181,7 +278,8 @@ const handleSubmit = async () => {
         kn: productDetails.kannadaDescription,
         ml: productDetails.malayalamDescription,
       },
-      productVideoUrl: productDetails.videoUrl,
+      productVideoUrl: productDetails.productVideoUrl,
+      howToPlantVideoUrl: productDetails.howToPlantVideoUrl,
       cutType: productDetails.cutType,
       flavor: productDetails.flavor,
       shelfLife: productDetails.shelfLife,
@@ -208,14 +306,46 @@ const handleSubmit = async () => {
       shippingExpressOutside: Number(weightShippingData.shippingExpressOutside),
       isExpressOnly: weightShippingData.isExpressOnly,
       youtubeVideoId: (() => {
-        const url = productDetails.videoUrl;
+        const url = productDetails.productVideoUrl?.en || "";
         if (!url) return "";
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : url;
       })(),
-      statisticalHighlights: marketingData.highlights,
-      howToUseSteps: marketingData.howToUse,
+      statisticalHighlights: (marketingData.highlights || []).map(h => ({
+        title: typeof h.title === 'object' && h.title !== null ? h.title : { en: h.title || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+        description: typeof h.description === 'object' && h.description !== null ? h.description : { en: h.description || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+        image: h.image || ''
+      })),
+      howToUseSteps: (marketingData.howToUse || []).map(s => {
+        let bullets = s.bullets;
+        if (Array.isArray(bullets)) {
+          bullets = {
+            en: bullets,
+            ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+          };
+        } else if (!bullets) {
+          bullets = {
+            en: [''], ta: [''], hi: [''], te: [''], kn: [''], ml: ['']
+          };
+        } else {
+          bullets = {
+            en: Array.isArray(bullets.en) ? bullets.en : [''],
+            ta: Array.isArray(bullets.ta) ? bullets.ta : [''],
+            hi: Array.isArray(bullets.hi) ? bullets.hi : [''],
+            te: Array.isArray(bullets.te) ? bullets.te : [''],
+            kn: Array.isArray(bullets.kn) ? bullets.kn : [''],
+            ml: Array.isArray(bullets.ml) ? bullets.ml : [''],
+          };
+        }
+        return {
+          title: typeof s.title === 'object' && s.title !== null ? s.title : { en: s.title || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+          heading: typeof s.heading === 'object' && s.heading !== null ? s.heading : { en: s.heading || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+          description: typeof s.description === 'object' && s.description !== null ? s.description : { en: s.description || '', ta: '', hi: '', te: '', kn: '', ml: '' },
+          image: s.image || '',
+          bullets: bullets
+        };
+      }),
     };
 
     await updateProduct(productId, payload);
@@ -300,8 +430,20 @@ const handleSubmit = async () => {
         storageInstructions={productDetails.storageInstructions}
         setStorageInstructions={(val) => setProductDetails((prev) => ({ ...prev, storageInstructions: val }))}
 
-        videoUrl={productDetails.videoUrl}
-        setVideoUrl={(val) => setProductDetails((prev) => ({ ...prev, videoUrl: val }))}
+        productVideoUrl={productDetails.productVideoUrl}
+        setProductVideoUrl={(lang, val) =>
+          setProductDetails((prev) => ({
+            ...prev,
+            productVideoUrl: { ...prev.productVideoUrl, [lang]: val },
+          }))
+        }
+        howToPlantVideoUrl={productDetails.howToPlantVideoUrl}
+        setHowToPlantVideoUrl={(lang, val) =>
+          setProductDetails((prev) => ({
+            ...prev,
+            howToPlantVideoUrl: { ...prev.howToPlantVideoUrl, [lang]: val },
+          }))
+        }
 
         certifications={productDetails.certifications}
         addCertification={(cert) => setProductDetails((prev) => ({ ...prev, certifications: [...prev.certifications, cert] }))}

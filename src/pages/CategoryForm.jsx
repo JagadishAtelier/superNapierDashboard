@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { Lightbulb, Image, X, ChevronDown, ArrowLeft } from "lucide-react";
-import { createCategory,updateCategory } from "../api/categoryApi"; // ✅ ADD THIS
+import { createCategory, updateCategory, getCategoryById } from "../api/categoryApi"; // ✅ ADD THIS
 import { uploadToCloudinary } from "../api/imageUpload"; // ✅ adjust path
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 const LANGUAGES = [
     { code: "en", label: "English", apiCode: "en-t-i0-und" },
@@ -23,39 +23,62 @@ const CategoryForm = () => {
         kn: "",
         ml: "",
     });
-    const navigate = useNavigate()
-    const location = useLocation()
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { id } = useParams();
+    const isEditMode = !!id;
     const categoryData = location.state?.category;
+
     const [isSyncing, setIsSyncing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [loadingCategory, setLoadingCategory] = useState(false);
     const abortControllerRef = useRef(null);
     const cache = useRef({});
 
     const fileInputRef = useRef(null);
     const [images, setImages] = useState([]);
-const isEditMode = !!categoryData;
 
     useEffect(() => {
-    if (categoryData) {
-        setFormData({
-            en: categoryData.name?.en || "",
-            ta: categoryData.name?.ta || "",
-            hi: categoryData.name?.hi || "",
-            te: categoryData.name?.te || "",
-            kn: categoryData.name?.kn || "",
-            ml: categoryData.name?.ml || "",
-        });
+        const loadCategory = async () => {
+            if (isEditMode) {
+                let currentCat = categoryData;
+                if (!currentCat) {
+                    try {
+                        setLoadingCategory(true);
+                        currentCat = await getCategoryById(id);
+                    } catch (error) {
+                        console.error("Failed to fetch category by id:", error);
+                        toast.error("Failed to load category data");
+                        navigate("/categories");
+                        return;
+                    } finally {
+                        setLoadingCategory(false);
+                    }
+                }
 
-        // ✅ Set images preview (from backend URLs)
-        if (categoryData.image) {
-            const formattedImages = categoryData.image.map((url) => ({
-                preview: url,   // show existing image
-                file: null      // no file initially
-            }));
-            setImages(formattedImages);
-        }
-    }
-}, [categoryData]);
+                if (currentCat) {
+                    setFormData({
+                        en: currentCat.name?.en || "",
+                        ta: currentCat.name?.ta || "",
+                        hi: currentCat.name?.hi || "",
+                        te: currentCat.name?.te || "",
+                        kn: currentCat.name?.kn || "",
+                        ml: currentCat.name?.ml || "",
+                    });
+
+                    if (currentCat.image) {
+                        const formattedImages = (Array.isArray(currentCat.image) ? currentCat.image : [currentCat.image]).map((url) => ({
+                            preview: url,
+                            file: null
+                        }));
+                        setImages(formattedImages);
+                    }
+                }
+            }
+        };
+
+        loadCategory();
+    }, [id, isEditMode, categoryData, navigate]);
 
     // ================= TRANSLITERATION =================
     const fetchTransliteration = async (text, targetLang) => {
@@ -171,7 +194,7 @@ const handleSubmit = async () => {
         };
 
         if (isEditMode) {
-            const categoryId = categoryData._id;
+            const categoryId = id || categoryData?._id;
 
             const promise = updateCategory(categoryId, payload);
 
@@ -218,6 +241,15 @@ const handleSubmit = async () => {
 };
 
     // ================= UI =================
+    if (loadingCategory) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <span className="ml-2 text-gray-600 font-medium">Loading category...</span>
+            </div>
+        );
+    }
+
     return (
         <div className="p-5 bg-white space-y-5 max-w-6xl mx-auto shadow-lg rounded-lg">
 

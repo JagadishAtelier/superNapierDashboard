@@ -50,9 +50,10 @@ export default function NotificationModal({
   // initialize audio enabled from localStorage (remember user's choice)
   const [audioEnabled, setAudioEnabled] = useState(() => {
     try {
-      return !!localStorage.getItem(`${storageKey}_audio_enabled`);
+      const val = localStorage.getItem(`${storageKey}_audio_enabled`);
+      return val === null ? true : val === "1" || val === "true";
     } catch {
-      return false;
+      return true;
     }
   });
   const [audioBlocked, setAudioBlocked] = useState(false);
@@ -73,7 +74,7 @@ export default function NotificationModal({
 
   // create audio element once
   useEffect(() => {
-    const a = new Audio("/order_placed_notification.mp3");
+    const a = new Audio("/swiggy_new_order.mp3");
     a.preload = "auto";
     a.loop = false;
     audioRef.current = a;
@@ -91,6 +92,49 @@ export default function NotificationModal({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Automatic gesture-based audio unlock helper
+  useEffect(() => {
+    const handleGesture = async () => {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) {
+        if (!audioCtxRef.current) {
+          audioCtxRef.current = new AC();
+        }
+        if (audioCtxRef.current.state === "suspended") {
+          try {
+            await audioCtxRef.current.resume();
+          } catch {}
+        }
+      }
+      
+      // Attempt a silent play-pause on audioRef to unlock the Audio element
+      if (audioRef.current && audioEnabled) {
+        try {
+          const originalVolume = audioRef.current.volume;
+          audioRef.current.volume = 0;
+          await audioRef.current.play();
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+          audioRef.current.volume = originalVolume;
+          setAudioBlocked(false);
+        } catch (err) {
+          // ignore failures on initial background gesture
+        }
+      }
+
+      document.removeEventListener("click", handleGesture);
+      document.removeEventListener("keydown", handleGesture);
+    };
+
+    document.addEventListener("click", handleGesture);
+    document.addEventListener("keydown", handleGesture);
+
+    return () => {
+      document.removeEventListener("click", handleGesture);
+      document.removeEventListener("keydown", handleGesture);
+    };
+  }, [audioEnabled]);
 
   const persistNotifications = (arr) => {
     try {
@@ -201,7 +245,7 @@ export default function NotificationModal({
   const disableAudio = () => {
     setAudioEnabled(false);
     try {
-      localStorage.removeItem(`${storageKey}_audio_enabled`);
+      localStorage.setItem(`${storageKey}_audio_enabled`, "false");
     } catch {}
     toast("Sound notifications disabled");
   };

@@ -9,15 +9,15 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
 
   return (
     <header className="bg-[#fafcf8] rounded-tl-[50px] rounded-tr-[50px] py-4 px-4 sm:px-6 md:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
-      
+
       {/* Welcome text for desktop */}
       <div className="text-2xl hidden lg:block md:text-lg  lg:text-3xl text-[#42427D]">
         <span className="font-medium me-1">Welcome</span>, <strong>Admin</strong>
       </div>
 
       {/* Search, Mobile Menu & Icons */}
-      <div className="flex sm:flex-nowrap items-center gap-3 w-full">
-        
+      <div className="flex sm:flex-nowrap items-center gap-3">
+
         {/* Mobile Hamburger Menu Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -25,11 +25,12 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
         >
           {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-      <div className="text-2xl hidden md:block lg:hidden md:text-lg  lg:text-3xl text-[#42427D]">
-        <span className="font-medium me-1">Welcome</span>, <strong>Admin</strong>
-      </div>
+
+        <div className="text-xl hidden md:block lg:hidden md:text-lg  lg:text-2xl text-[#42427D] w-80">
+          <span className="font-medium me-1">Welcome</span>, <strong>Admin</strong>
+        </div>
         {/* Search Input */}
-        <div className="relative flex-1 md:w-72">
+        <div className="relative w-40 sm:w-48 md:w-56 ml-auto">
           <input
             type="text"
             placeholder="Search..."
@@ -72,7 +73,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
             />
           </svg>
-          {!active_notif && (
+          {active_notif && (
             <span className="absolute top-[-2px] right-[-2px] block h-2 w-2 rounded-full bg-red-500" />
           )}
         </button>

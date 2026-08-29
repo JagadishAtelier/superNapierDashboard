@@ -1,13 +1,10 @@
-import axios from "axios";
-
-// ✅ Ensure this is set in your `.env` like: VITE_API_BASE_URL=https://yourdomain.com
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/categories`;
+import api from "./authApi";
 
 /**
  * GET all categories
  */
 export const getAllCategories = async () => {
-  const response = await axios.get(BASE_URL);
+  const response = await api.get("/categories");
   return response.data;
 };
 
@@ -16,7 +13,7 @@ export const getAllCategories = async () => {
  * @param {string} categoryId
  */
 export const getCategoryById = async (categoryId) => {
-  const response = await axios.get(`${BASE_URL}/${categoryId}`);
+  const response = await api.get(`/categories/${categoryId}`);
   return response.data;
 };
 
@@ -25,7 +22,7 @@ export const getCategoryById = async (categoryId) => {
  * @param {object} categoryData
  */
 export const createCategory = async (categoryData) => {
-  const response = await axios.post(BASE_URL, categoryData);
+  const response = await api.post("/categories", categoryData);
   return response.data;
 };
 
@@ -35,7 +32,7 @@ export const createCategory = async (categoryData) => {
  * @param {object} updatedData
  */
 export const updateCategory = async (categoryId, updatedData) => {
-  const response = await axios.put(`${BASE_URL}/${categoryId}`, updatedData);
+  const response = await api.put(`/categories/${categoryId}`, updatedData);
   return response.data;
 };
 
@@ -44,7 +41,7 @@ export const updateCategory = async (categoryId, updatedData) => {
  * @param {string} categoryId
  */
 export const deleteCategory = async (categoryId) => {
-  const response = await axios.delete(`${BASE_URL}/${categoryId}`);
+  const response = await api.delete(`/categories/${categoryId}`);
   return response.data;
 };
 
@@ -58,7 +55,7 @@ export const deleteCategory = async (categoryId) => {
  * @param {object} subcategoryData
  */
 export const addSubcategory = async (categoryId, subcategoryData) => {
-  const response = await axios.post(`${BASE_URL}/${categoryId}/subcategory`, subcategoryData);
+  const response = await api.post(`/categories/${categoryId}/subcategory`, subcategoryData);
   return response.data;
 };
 
@@ -68,6 +65,7 @@ export const addSubcategory = async (categoryId, subcategoryData) => {
  * @param {number} subIndex
  */
 export const deleteSubcategory = async (categoryId, subIndex) => {
-  const response = await axios.delete(`${BASE_URL}/${categoryId}/subcategory/${subIndex}`);
+  const response = await api.delete(`/categories/${categoryId}/subcategory/${subIndex}`);
   return response.data;
 };
+
