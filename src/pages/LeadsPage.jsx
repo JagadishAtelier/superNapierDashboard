@@ -80,7 +80,7 @@ export default function LeadsPage() {
           return;
         }
 
-        const headers = ['Type', 'Status', 'Date', 'Name', 'Email', 'Phone', 'Company', 'Acreage', 'Message'];
+        const headers = ['Type', 'Status', 'Date', 'Name', 'Email', 'Phone', 'Company', 'Acreage', 'Products', 'Message'];
         const csvContent = [
           headers.join(','),
           ...rows.map(row => {
@@ -93,6 +93,7 @@ export default function LeadsPage() {
               `"${(row.phone || '').replace(/"/g, '""')}"`,
               `"${(row.company || '').replace(/"/g, '""')}"`,
               `"${(row.acreage || '').replace(/"/g, '""')}"`,
+              `"${(row.products ? row.products.map(p => typeof p.name === 'object' ? p.name?.en : p.name).join(', ') : '').replace(/"/g, '""')}"`,
               `"${(row.message || '').replace(/"/g, '""')}"`
             ].join(',');
           })
@@ -329,6 +330,21 @@ export default function LeadsPage() {
                   <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Date Submitted</p>
                   <p className="font-medium text-gray-900">{new Date(selectedLead.createdAt).toLocaleString()}</p>
                 </div>
+                {selectedLead.products && selectedLead.products.length > 0 && (
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Interested Products</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedLead.products.map(p => {
+                         const name = typeof p.name === 'object' ? (p.name?.en || 'Product') : (p.name || 'Product');
+                         return (
+                           <span key={p._id} className="bg-green-50 text-green-800 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+                             {name}
+                           </span>
+                         );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
