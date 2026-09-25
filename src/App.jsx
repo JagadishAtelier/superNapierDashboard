@@ -30,6 +30,7 @@ import NewDashboard from './pages/NewDashboard/NewDashboard';
 import SettingsPage from './pages/SettingsPage';
 import DistributionMapPage from './pages/DistributionMapPage';
 import PageCms from './pages/PageCms/PageCms';
+import LeadsPage from './pages/LeadsPage';
 export default function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -58,6 +59,7 @@ export default function App() {
             <Route index element={<NewDashboard />} />
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
+            <Route path="/leads" element={<LeadsPage />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/Addproducts" element={<ProductFormModal />} />
             <Route path="/editproduct/:productId" element={<EditProduct />} />

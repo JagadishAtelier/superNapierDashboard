@@ -15,6 +15,7 @@ import {
   FileText,
   Settings,
   Globe,
+  Inbox
 } from "lucide-react";
 
 export default function Sidebar({ setSidebarOpen }) {
@@ -214,6 +215,23 @@ export default function Sidebar({ setSidebarOpen }) {
         >
           <Globe />
           {!collapsed && <span>CMS</span>}
+        </NavLink>
+
+        {/* Leads */}
+        <NavLink
+          to="/leads"
+          onClick={handleNavClick}
+          className={({ isActive }) =>
+            `flex items-center gap-2 ${collapsed ? "justify-center" : "ps-3 pe-5"
+            } py-3 rounded-[13px] rounded-tr-[0px] rounded-br-[0px] transition relative ${isActive
+              ? "text-[#0a2613] font-medium active-tab active-tab-bg"
+              : "hover:bg-[#fafcf8] hover:text-[#0a2613]"
+            }`
+          }
+          title={collapsed ? "Leads & Inquiries" : undefined}
+        >
+          <Inbox />
+          {!collapsed && <span>Leads</span>}
         </NavLink>
 
         {/* Settings */}
